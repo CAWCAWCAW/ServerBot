@@ -16,7 +16,6 @@ namespace Bot
         public TSPlayer TSPlayer { get { return TShock.Players[Index]; } }
         public string PlayerName { get { return Main.player[Index].name; } }
 
-
         public Pl(int index)
         {
             Index = index;

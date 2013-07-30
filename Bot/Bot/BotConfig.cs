@@ -13,7 +13,7 @@ namespace Bot
         public byte OnjoinBotColourR = 255;
         public byte OnjoinBotColourG = 255;
         public byte OnjoinBotColourB = 255;
-        public string Comment2 = "The character or word used to execute bot commands. EG: ^ kill white";
+        public string Comment2 = "The character or word used to execute bot commands. EG: ^ kill WhiteX";
         public string CommandChar = "^";
         public string Comment3 = "The bot that will execute the commands in the command char. Can be the same as onjoin bot's name.";
         public string CommandBot = "Botname";

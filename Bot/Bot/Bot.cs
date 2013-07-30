@@ -14,7 +14,7 @@ namespace Bot
         public string type = "";
         public string message = "";
         public int msgtime = 0;
-        public Color msgcol;
+        public Color msgcol;  //message colour
         public string Name;
         public byte r;
         public byte g;

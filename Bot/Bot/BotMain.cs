@@ -40,7 +40,7 @@ namespace Bot
         #region Name, Version, Author, Description, Hooks
         public override string Name
         {
-            get { return "Bots"; }
+            get { return "Bot"; }
         }
 
         public override Version Version
@@ -50,12 +50,12 @@ namespace Bot
 
         public override string Author
         {
-            get { return "White"; }
+            get { return "WhiteX"; }
         }
 
         public override string Description
         {
-            get { return "Terraria server bot(s)!"; }
+            get { return "Terraria server bot(s)."; }
         }
 
         public override void Initialize()
