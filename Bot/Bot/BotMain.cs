@@ -989,7 +989,7 @@ namespace Bot
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine(string.Format("Bot '{0}' was summoned by {1}", name, plyname));
                 Console.ResetColor();
-                Log.Warn(string.Format("{0} made a bot named '{1}' join", plyname, name));
+                Log.Warn(string.Format("{0} made bot '{1}' join", plyname, name));
             }
             else if (z.Parameters[0] == "leave")
             {
