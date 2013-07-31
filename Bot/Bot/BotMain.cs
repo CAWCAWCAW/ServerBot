@@ -1023,7 +1023,7 @@ namespace Bot
                     }
                     else
                     {
-                        z.Player.SendWarningMessage(string.Format("Bot name '{0}' does not exist", z.Parameters[1]));
+                        z.Player.SendWarningMessage(string.Format("Bot '{0}' does not exist", z.Parameters[1]));
                     }
                 }
             }
