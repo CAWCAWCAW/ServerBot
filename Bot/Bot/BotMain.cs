@@ -1019,7 +1019,7 @@ namespace Bot
                         b.r = Convert.ToByte(z.Parameters[2]);
                         b.g = Convert.ToByte(z.Parameters[3]);
                         b.b = Convert.ToByte(z.Parameters[4]);
-                        z.Player.SendSuccessMessage(string.Format("Set bot {3}'s colo(u)r to {0}, {1}, {2}", b.r, b.g, b.b, b.Name));
+                        z.Player.SendSuccessMessage(string.Format("Set bot {3}'s chat colo(u)r to {0}, {1}, {2}", b.r, b.g, b.b, b.Name));
                     }
                     else
                     {
