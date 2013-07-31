@@ -1168,7 +1168,7 @@ namespace Bot
                 QueryResult reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
                 if (!reader.Read())
                 {
-                    db.Query("INSERT INTO BotTable (SwearBlock) VALUES (@0)", z.Parameters[1]);
+                    db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", z.Parameters[1]);
                     z.Player.SendMessage(string.Format("Added word {0} into the banned word list.", z.Parameters[1]), Color.CadetBlue);
                 }
                 else
@@ -1181,7 +1181,7 @@ namespace Bot
                 QueryResult reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
                 if (reader.Read())
                 {
-                    db.Query("DELETE FROM BotTable WHERE SwearBlock = @0", z.Parameters[1]);
+                    db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
                     z.Player.SendMessage(string.Format("Delete word {0} from the banned word list.", z.Parameters[1]), Color.CadetBlue);
                 }
                 else
@@ -1207,7 +1207,7 @@ namespace Bot
                     QueryResult reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
                     if (!reader.Read())
                     {
-                        db.Query("INSERT INTO BotTable (KickNames) VALUES (@0)", z.Parameters[1]);
+                        db.Query("INSERT INTO BotKick (KickNames) VALUES (@0)", z.Parameters[1]);
                         z.Player.SendMessage(string.Format("Added player {0} to the joinkick player list.", z.Parameters[1]), Color.CadetBlue);
                     }
                     else
@@ -1220,8 +1220,8 @@ namespace Bot
                     QueryResult reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
                     if (reader.Read())
                     {
-                        db.Query("DELETE FROM BotTable WHERE KickNames = @0", z.Parameters[1]);
-                        z.Player.SendMessage(string.Format("Delete player {0} from the joinkick player list!", z.Parameters[1]), Color.CadetBlue);
+                        db.Query("DELETE FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
+                        z.Player.SendMessage(string.Format("Deleted player {0} from the joinkick player list!", z.Parameters[1]), Color.CadetBlue);
                     }
                     else
                     {
