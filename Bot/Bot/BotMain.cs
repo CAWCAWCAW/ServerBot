@@ -1169,11 +1169,11 @@ namespace Bot
                 if (!reader.Read())
                 {
                     db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", z.Parameters[1]);
-                    z.Player.SendMessage(string.Format("Added word {0} into the banned word list.", z.Parameters[1]), Color.CadetBlue);
+                    z.Player.SendMessage(string.Format("Added {0} into the banned word list.", z.Parameters[1]), Color.CadetBlue);
                 }
                 else
                 {
-                    z.Player.SendWarningMessage(string.Format("Word {0} already exists in the swear list.", z.Parameters[1]));
+                    z.Player.SendWarningMessage(string.Format("{0} already exists in the swear list.", z.Parameters[1]));
                 }
             }
             else if (z.Parameters[0] == "del")
@@ -1182,11 +1182,11 @@ namespace Bot
                 if (reader.Read())
                 {
                     db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
-                    z.Player.SendMessage(string.Format("Delete word {0} from the banned word list.", z.Parameters[1]), Color.CadetBlue);
+                    z.Player.SendMessage(string.Format("Deleted {0} from the banned word list.", z.Parameters[1]), Color.CadetBlue);
                 }
                 else
                 {
-                    z.Player.SendWarningMessage(string.Format("Word {0} does not exist in the swear list.", z.Parameters[1]));
+                    z.Player.SendWarningMessage(string.Format("{0} does not exist in the swear list.", z.Parameters[1]));
                 }
             }
         }
@@ -1208,11 +1208,11 @@ namespace Bot
                     if (!reader.Read())
                     {
                         db.Query("INSERT INTO BotKick (KickNames) VALUES (@0)", z.Parameters[1]);
-                        z.Player.SendMessage(string.Format("Added player {0} to the joinkick player list.", z.Parameters[1]), Color.CadetBlue);
+                        z.Player.SendMessage(string.Format("Added {0} to the joinkick player list.", z.Parameters[1]), Color.CadetBlue);
                     }
                     else
                     {
-                        z.Player.SendWarningMessage(string.Format("Player {0} already exists in the joinkick player list!", z.Parameters[1]));
+                        z.Player.SendWarningMessage(string.Format("{0} already exists in the joinkick player list!", z.Parameters[1]));
                     }
                 }
                 else if (z.Parameters[0] == "del")
@@ -1221,11 +1221,11 @@ namespace Bot
                     if (reader.Read())
                     {
                         db.Query("DELETE FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
-                        z.Player.SendMessage(string.Format("Deleted player {0} from the joinkick player list!", z.Parameters[1]), Color.CadetBlue);
+                        z.Player.SendMessage(string.Format("Deleted {0} from the joinkick player list!", z.Parameters[1]), Color.CadetBlue);
                     }
                     else
                     {
-                        z.Player.SendWarningMessage(string.Format("Player {0} does not exist on the joinkick player list!", z.Parameters[1]));
+                        z.Player.SendWarningMessage(string.Format("{0} does not exist on the joinkick player list!", z.Parameters[1]));
                     }
                 }
             }
