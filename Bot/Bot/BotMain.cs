@@ -371,7 +371,6 @@ namespace Bot
                 {
                     if (text.ToLower().Contains("yolo") || text.ToLower().Contains("YOLO") || text.ToLower().Contains("Y.O.L.O") || text.ToLower().Contains("Yolo"))
                     {
-                        e.Handled = true;
                         var plr = TShock.Utils.FindPlayer(pl.Name)[0];
                         if (bcfg.FailNoobAction == "kill")
                         {
@@ -390,7 +389,6 @@ namespace Bot
                     }
                     if (text.StartsWith("Swag") || text.Contains("Swag") || text.StartsWith("SWAG") || text.Contains("SWAG") || text.StartsWith("S.W.A.G") || text.Contains("S.W.A.G") || text.StartsWith("swag") || text.Contains("swag") || text.StartsWith("Swa g") || text.Contains("Swa g") || text.StartsWith("swa g") || text.Contains("swa g"))
                     {
-                        e.Handled = true;
                         var player = TShock.Utils.FindPlayer(pl.Name);
                         var plr = player[0];
                         if (bcfg.FailNoobAction == "kill")
