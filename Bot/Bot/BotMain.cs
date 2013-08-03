@@ -45,7 +45,7 @@ namespace Bot
 
         public override Version Version
         {
-            get { return Assembly.GetExecutingAssembly().GetName().Version; }
+            get { return new Version(1, 0, 9); }
         }
 
         public override string Author
@@ -219,32 +219,34 @@ namespace Bot
             #region Bot.AutoKick, Bot.AutoBan
             var ply = players[who];
             ply.kcount = 0;
-            QueryResult reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", ply.PlayerName);
-            if (reader.Read() && ply.kcount < bcfg.KickCountB4Ban)
+            using (var reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", ply.PlayerName))
             {
-                db.Query("UPDATE BotKick SET KickIP = @0 WHERE KickNames = @1", ply.TSPlayer.IP, ply.PlayerName);
-                TShock.Utils.ForceKick(ply.TSPlayer, bcfg.OnjoinBot + " kick", false, false);
-                ply.kcount++;
-            }
+                if (reader.Read() && ply.kcount < bcfg.KickCountB4Ban)
+                {
+                    db.Query("UPDATE BotKick SET KickIP = @0 WHERE KickNames = @1", ply.TSPlayer.IP, ply.PlayerName);
+                    TShock.Utils.ForceKick(ply.TSPlayer, bcfg.OnjoinBot + " kick", false, false);
+                    ply.kcount++;
+                }
 
-            else if (reader.Read() && ply.kcount > bcfg.KickCountB4Ban)
-            {
-                db.Query("UPDATE BotKick SET KickIP = @0 WHERE KickNames = @1", ply.TSPlayer.IP, ply.PlayerName);
-                TShock.Utils.Ban(ply.TSPlayer, bcfg.OnjoinBot + " ban", true, null);
-                ply.kcount++;
-            }
+                else if (reader.Read() && ply.kcount > bcfg.KickCountB4Ban)
+                {
+                    db.Query("UPDATE BotKick SET KickIP = @0 WHERE KickNames = @1", ply.TSPlayer.IP, ply.PlayerName);
+                    TShock.Utils.Ban(ply.TSPlayer, bcfg.OnjoinBot + " ban", true, null);
+                    ply.kcount++;
+                }
 
-            if (ply.TSPlayer.IP == IP && ply.kcount < bcfg.KickCountB4Ban)
-            {
-                db.Query("UPDATE BotKick SET KickIP = @0 WHERE KickNames = @1", ply.TSPlayer.IP, ply.PlayerName);
-                TShock.Utils.ForceKick(ply.TSPlayer, bcfg.OnjoinBot.ToString() + " kick", false, false);
-                ply.kcount++;
-            }
+                if (ply.TSPlayer.IP == IP && ply.kcount < bcfg.KickCountB4Ban)
+                {
+                    db.Query("UPDATE BotKick SET KickIP = @0 WHERE KickNames = @1", ply.TSPlayer.IP, ply.PlayerName);
+                    TShock.Utils.ForceKick(ply.TSPlayer, bcfg.OnjoinBot.ToString() + " kick", false, false);
+                    ply.kcount++;
+                }
 
-            else if (ply.TSPlayer.IP == IP && ply.kcount > bcfg.KickCountB4Ban)
-            {
-                db.Query("UPDATE BotKick SET KickIP = @0 WHERE KickNames = @1", ply.TSPlayer.IP, ply.PlayerName);
-                TShock.Utils.Ban(ply.TSPlayer, bcfg.OnjoinBot.ToString() + " ban", true, null);
+                else if (ply.TSPlayer.IP == IP && ply.kcount > bcfg.KickCountB4Ban)
+                {
+                    db.Query("UPDATE BotKick SET KickIP = @0 WHERE KickNames = @1", ply.TSPlayer.IP, ply.PlayerName);
+                    TShock.Utils.Ban(ply.TSPlayer, bcfg.OnjoinBot.ToString() + " ban", true, null);
+                }
             }
             #endregion
         }
@@ -323,31 +325,33 @@ namespace Bot
                             var parts = text.Split();
                             foreach (string s in parts)
                             {
-                                QueryResult reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", s);
-                                if (reader.Read())
+                                using (var reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", s))
                                 {
-                                    if (bcfg.SwearBlockAction == "kick")
+                                    if (reader.Read())
                                     {
-                                        p.scount++;
-                                        p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}", p.scount));
-                                        if (p.scount >= bcfg.SwearBlockChances)
+                                        if (bcfg.SwearBlockAction == "kick")
                                         {
-                                            TShock.Utils.ForceKick(pl, "Swearing", false, false);
-                                            p.scount = 0;
+                                            p.scount++;
+                                            p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}", p.scount));
+                                            if (p.scount >= bcfg.SwearBlockChances)
+                                            {
+                                                TShock.Utils.ForceKick(pl, "Swearing", false, false);
+                                                p.scount = 0;
+                                            }
+                                            e.Handled = true;
                                         }
-                                        e.Handled = true;
-                                    }
-                                    else if (bcfg.SwearBlockAction == "mute")
-                                    {
-                                        p.scount++;
-                                        p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}/{1}", p.scount, bcfg.SwearBlockChances));
-                                        if (p.scount >= bcfg.SwearBlockChances)
+                                        else if (bcfg.SwearBlockAction == "mute")
                                         {
-                                            pl.mute = true;
-                                            pl.SendWarningMessage("You have been muted for swearing!");
-                                            p.scount = 0;
+                                            p.scount++;
+                                            p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}/{1}", p.scount, bcfg.SwearBlockChances));
+                                            if (p.scount >= bcfg.SwearBlockChances)
+                                            {
+                                                pl.mute = true;
+                                                pl.SendWarningMessage("You have been muted for swearing!");
+                                                p.scount = 0;
+                                            }
+                                            e.Handled = true;
                                         }
-                                        e.Handled = true;
                                     }
                                 }
                             }
@@ -362,7 +366,7 @@ namespace Bot
             {
                 if (bcfg.EnableYoloSwagBlock)
                 {
-                    if (text.StartsWith("yolo") || text.Contains("yolo") || text.StartsWith("YOLO") || text.Contains("YOLO") || text.StartsWith("Y.O.L.O") || text.Contains("Y.O.L.O") || text.StartsWith("Yolo") || text.Contains("Yolo"))
+                    if (text.ToLower().Contains("yolo") || text.ToLower().Contains("YOLO") || text.ToLower().Contains("Y.O.L.O") || text.ToLower().Contains("Yolo"))
                     {
                         e.Handled = true;
                         var plr = TShock.Utils.FindPlayer(pl.Name)[0];
@@ -1165,28 +1169,32 @@ namespace Bot
             }
             else if (z.Parameters[0] == "add")
             {
-                QueryResult reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
-                if (!reader.Read())
+                using (var reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]))
                 {
-                    db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", z.Parameters[1]);
-                    z.Player.SendMessage(string.Format("Added {0} into the banned word list.", z.Parameters[1]), Color.CadetBlue);
-                }
-                else
-                {
-                    z.Player.SendWarningMessage(string.Format("{0} already exists in the swear list.", z.Parameters[1]));
+                    if (!reader.Read())
+                    {
+                        db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", z.Parameters[1]);
+                        z.Player.SendMessage(string.Format("Added {0} into the banned word list.", z.Parameters[1]), Color.CadetBlue);
+                    }
+                    else
+                    {
+                        z.Player.SendWarningMessage(string.Format("{0} already exists in the swear list.", z.Parameters[1]));
+                    }
                 }
             }
             else if (z.Parameters[0] == "del")
             {
-                QueryResult reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
-                if (reader.Read())
+                using (var reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]))
                 {
-                    db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
-                    z.Player.SendMessage(string.Format("Deleted {0} from the banned word list.", z.Parameters[1]), Color.CadetBlue);
-                }
-                else
-                {
-                    z.Player.SendWarningMessage(string.Format("{0} does not exist in the swear list.", z.Parameters[1]));
+                    if (reader.Read())
+                    {
+                        db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
+                        z.Player.SendMessage(string.Format("Deleted {0} from the banned word list.", z.Parameters[1]), Color.CadetBlue);
+                    }
+                    else
+                    {
+                        z.Player.SendWarningMessage(string.Format("{0} does not exist in the swear list.", z.Parameters[1]));
+                    }
                 }
             }
         }
@@ -1204,28 +1212,32 @@ namespace Bot
                 if (z.Parameters[0] == "add")
                 {
                     var ply = TShock.Users.GetUserByName(z.Parameters[1]);
-                    QueryResult reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
-                    if (!reader.Read())
+                    using (var reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]))
                     {
-                        db.Query("INSERT INTO BotKick (KickNames) VALUES (@0)", z.Parameters[1]);
-                        z.Player.SendMessage(string.Format("Added {0} to the joinkick player list.", z.Parameters[1]), Color.CadetBlue);
-                    }
-                    else
-                    {
-                        z.Player.SendWarningMessage(string.Format("{0} already exists in the joinkick player list!", z.Parameters[1]));
+                        if (!reader.Read())
+                        {
+                            db.Query("INSERT INTO BotKick (KickNames) VALUES (@0)", z.Parameters[1]);
+                            z.Player.SendMessage(string.Format("Added {0} to the joinkick player list.", z.Parameters[1]), Color.CadetBlue);
+                        }
+                        else
+                        {
+                            z.Player.SendWarningMessage(string.Format("{0} already exists in the joinkick player list!", z.Parameters[1]));
+                        }
                     }
                 }
                 else if (z.Parameters[0] == "del")
                 {
-                    QueryResult reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
-                    if (reader.Read())
+                    using (var reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]))
                     {
-                        db.Query("DELETE FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
-                        z.Player.SendMessage(string.Format("Deleted {0} from the joinkick player list!", z.Parameters[1]), Color.CadetBlue);
-                    }
-                    else
-                    {
-                        z.Player.SendWarningMessage(string.Format("{0} does not exist on the joinkick player list!", z.Parameters[1]));
+                        if (reader.Read())
+                        {
+                            db.Query("DELETE FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
+                            z.Player.SendMessage(string.Format("Deleted {0} from the joinkick player list!", z.Parameters[1]), Color.CadetBlue);
+                        }
+                        else
+                        {
+                            z.Player.SendWarningMessage(string.Format("{0} does not exist on the joinkick player list!", z.Parameters[1]));
+                        }
                     }
                 }
             }
