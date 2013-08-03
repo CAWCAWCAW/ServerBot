@@ -322,35 +322,38 @@ namespace Bot
                     {
                         if (p.PlayerName == pl.Name)
                         {
-                            var parts = text.Split();
-                            foreach (string s in parts)
+                            if (!text.StartsWith("/"))
                             {
-                                using (var reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", s))
+                                var parts = text.Split();
+                                foreach (string s in parts)
                                 {
-                                    if (reader.Read())
+                                    using (var reader = db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", s))
                                     {
-                                        if (bcfg.SwearBlockAction == "kick")
+                                        if (reader.Read())
                                         {
-                                            p.scount++;
-                                            p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}", p.scount));
-                                            if (p.scount >= bcfg.SwearBlockChances)
+                                            if (bcfg.SwearBlockAction == "kick")
                                             {
-                                                TShock.Utils.ForceKick(pl, "Swearing", false, false);
-                                                p.scount = 0;
+                                                p.scount++;
+                                                p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}", p.scount));
+                                                if (p.scount >= bcfg.SwearBlockChances)
+                                                {
+                                                    TShock.Utils.ForceKick(pl, "Swearing", false, false);
+                                                    p.scount = 0;
+                                                }
+                                                e.Handled = true;
                                             }
-                                            e.Handled = true;
-                                        }
-                                        else if (bcfg.SwearBlockAction == "mute")
-                                        {
-                                            p.scount++;
-                                            p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}/{1}", p.scount, bcfg.SwearBlockChances));
-                                            if (p.scount >= bcfg.SwearBlockChances)
+                                            else if (bcfg.SwearBlockAction == "mute")
                                             {
-                                                pl.mute = true;
-                                                pl.SendWarningMessage("You have been muted for swearing!");
-                                                p.scount = 0;
+                                                p.scount++;
+                                                p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}/{1}", p.scount, bcfg.SwearBlockChances));
+                                                if (p.scount >= bcfg.SwearBlockChances)
+                                                {
+                                                    pl.mute = true;
+                                                    pl.SendWarningMessage("You have been muted for swearing!");
+                                                    p.scount = 0;
+                                                }
+                                                e.Handled = true;
                                             }
-                                            e.Handled = true;
                                         }
                                     }
                                 }
