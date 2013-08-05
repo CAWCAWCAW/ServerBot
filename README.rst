@@ -1,6 +1,13 @@
-Bot help:
+========
+Bot Help
+========
 
-Commands:
+Commands
+========
+
+=======================================   ====================================================================================================================
+Command Name                              Description
+=======================================   ====================================================================================================================
 //bot join <botname>                      -Joins a bot into the server. The bot can then be controlled with its name.
 //bot leave <botname>                     -~Should~ remove the bot from the server. May be bugged. Haven't tested recently
 //bot kill <botname>                      -Does the same as //bot leave, but sends a cool message for lols
@@ -11,11 +18,17 @@ Commands:
 //bot list                                -Lists all the bots in the server
 //badwords [add/del] "word"               -Adds or deletes word from the swearlist. If added, players using the word will be reprimanded.
 //kickplayers [add/del] "player"          -Adds or deletes a player from the kickplayers list. If added, player will be kicked or banned on joining the server
+=======================================   ====================================================================================================================
 
-Bot commands:
-All bot commands MUST be prefixed by the command character.
-Command character in this document will be shown as "^"
+Bot Commands
+============
 
+All bot commands **must** be prefixed by the command character.
+Command character in this document will be shown as "^".
+
+=================     =================================================================================================================== 
+Command               Description
+=================     ===================================================================================================================
 ^ help
 ^ help- register
 ^ help- item
@@ -41,9 +54,10 @@ Command character in this document will be shown as "^"
 ^ insult player       Makes the bot insult player
 ^ g        |--        Nooby website finding system. Needs expanding
 ^ google   |--        ^        ^       ^      ^       ^      ^
+=================     ===================================================================================================================
 
-
-Config File:
+Config File
+===========
 # denotes a comment. Text preceded by a # should NOT be copied into any config files.
 
 {
