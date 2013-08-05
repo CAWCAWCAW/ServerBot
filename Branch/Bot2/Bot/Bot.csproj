@@ -12,10 +12,16 @@
     <AssemblyName>Bot</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SignAssembly>False</SignAssembly>
+    <DelaySign>False</DelaySign>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>Full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -30,22 +36,27 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>4194304</BaseAddress>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Data.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Updates\TODOupdates\DLLrefs\Mono.Data.Sqlite.dll</HintPath>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>..\..\..\..\TShock-Quest-System-API1.3\DLLS\Mono.Data.Sqlite.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Updates\TODOupdates\DLLrefs\MySql.Data.dll</HintPath>
+    <Reference Include="MySql.Data">
+      <HintPath>..\..\..\..\TShock-Quest-System-API1.3\DLLS\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Web, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Updates\TODOupdates\DLLrefs\MySql.Web.dll</HintPath>
+    <Reference Include="MySql.Web">
+      <HintPath>..\..\..\..\TShock-Quest-System-API1.3\DLLS\MySql.Web.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.0.2.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Updates\TODOupdates\DLLrefs\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\TShock-Quest-System-API1.3\DLLS\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -54,14 +65,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TerrariaServer, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <ExecutableExtension>.exe</ExecutableExtension>
-      <HintPath>C:\Users\chris\Desktop\Transfer2\Ryst\TerrariaServer.exe</HintPath>
+    <Reference Include="TerrariaServer">
+      <HintPath>..\..\..\..\TShock-Quest-System-API1.3\DLLS\TerrariaServer.exe</HintPath>
     </Reference>
-    <Reference Include="TShockAPI, Version=4.0.5.222, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\chris\Desktop\Transfer2\Ryst\serverplugins\TShockAPI.dll</HintPath>
+    <Reference Include="TShockAPI">
+      <HintPath>..\..\..\..\TShock-Quest-System-API1.3\DLLS\TShockAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -71,6 +79,8 @@
     <Compile Include="BComs.cs" />
     <Compile Include="Pl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Trivia.cs" />
+    <Compile Include="TriviaConfig.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -19,11 +19,13 @@ namespace Bot
         public byte r;
         public byte g;
         public byte b;
+        public Trivia trivia;
 
         public Bot(int index, string name)
         {
             Index = index;
             Name = name;
+            trivia = new Trivia(name);
         }
     }
 }

@@ -77,14 +77,22 @@ namespace Bot
         {
             try
             {
-                if (File.Exists(BotMain.BotSave))
-                {
-                    BotMain.bcfg = BotConfig.Read(BotMain.BotSave);
-                }
-                else
-                {
-                    BotMain.bcfg.Write(BotMain.BotSave);
-                }
+            	if (Directory.Exists(Path.Combine(TShock.SavePath, "ServerBot")))
+	            	{
+	                if (File.Exists(BotMain.BotSave))
+	                {
+	                    BotMain.bcfg = BotConfig.Read(BotMain.BotSave);
+	                }
+	                else
+	                {
+	                    BotMain.bcfg.Write(BotMain.BotSave);
+	                }
+            	}
+            	else
+            	{
+            		Directory.CreateDirectory(Path.Combine(TShock.SavePath, "ServerBot"));
+            		BotMain.bcfg.Write(BotMain.BotSave);
+            	}
             }
             catch (Exception z)
             {

@@ -265,6 +265,10 @@ namespace Bot
         public static void ReloadCfg(CommandArgs z)
         {
             Utils.SetUpConfig();
+            foreach (Bot b in BotMain.bots)
+            {
+            	b.trivia.LoadConfig(BotMain.TriviaSave);
+            }
             z.Player.SendWarningMessage("Reloaded Bot config");
         }
         #endregion

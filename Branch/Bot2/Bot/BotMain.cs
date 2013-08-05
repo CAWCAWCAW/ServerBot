@@ -24,7 +24,8 @@ namespace Bot
     {
         public static BotConfig bcfg { get; set; }
         public WebRequest request;
-        internal static string BotSave { get { return Path.Combine(TShock.SavePath, "BotConfig.json"); } }
+        internal static string BotSave { get { return Path.Combine(TShock.SavePath, "ServerBot/BotConfig.json"); } }
+        internal static string TriviaSave { get { return Path.Combine(TShock.SavePath, "ServerBot/TriviaConfig.json"); } }
         public static List<Bot> bots = new List<Bot>();
         public static List<Pl> players = new List<Pl>();
         public static DateTime lastmsgupdate = DateTime.Now;
