@@ -24,14 +24,14 @@ namespace Bot
     {
         public static BotConfig bcfg { get; set; }
         public WebRequest request;
-        internal static string BotSave { get { return Path.Combine(TShock.SavePath, "BotConfig.json"); } }
+        internal static string BotSave { get { return Path.Combine(TShock.SavePath, "ServerBot/BotConfig.json"); } }
+        internal static string TriviaSave { get { return Path.Combine(TShock.SavePath, "ServerBot/TriviaConfig.json"); } }
         public static List<Bot> bots = new List<Bot>();
         public static List<Pl> players = new List<Pl>();
         public static DateTime lastmsgupdate = DateTime.Now;
         public static DateTime lastswearupdate = DateTime.Now;
         public static Random rid = new Random();
         public static string IP { get; set; }
-        public static TSServerPlayer CommandExec = new TSServerPlayer();
         public static Color RBC;
         public static int plycount = 0;
         public static string servername { get; set; }
@@ -86,8 +86,7 @@ namespace Bot
         public BotMain(Main game)
             : base(game)
         {
-            bcfg = new BotConfig();
-            Order = -1;
+            
         }
         #endregion
 
@@ -134,7 +133,9 @@ namespace Bot
                             {
                                 if (b.Name == bcfg.OnjoinBot)
                                 {
-                                    b.msgcol = new Color(bcfg.OnjoinBotColourB, bcfg.OnjoinBotColourG, bcfg.OnjoinBotColourR);
+                                	b.r = bcfg.OnjoinBotColourR;
+                                	b.g = bcfg.OnjoinBotColourG;
+                                	b.b = bcfg.OnjoinBotColourB;
                                 }
                             }
                             plycount++;
@@ -258,9 +259,9 @@ namespace Bot
                                     botmessagers++;
                                     if (b.message.StartsWith("/"))
                                     {
-                                        Commands.HandleCommand(CommandExec, b.message);
+                                        Commands.HandleCommand(TShockAPI.TSPlayer.Server, b.message);
                                     }
-                                    TSPlayer.All.SendMessage(b.message, b.msgcol);
+                                    TSPlayer.All.SendMessage(b.message, b.r, b.g, b.b);
 
                                     lastmsgupdate = DateTime.Now;
                                     return;
@@ -274,7 +275,7 @@ namespace Bot
                                 if (b.type == "asay")
                                 {
                                     botmessagers++;
-                                    TSPlayer.All.SendMessage(b.message, b.msgcol);
+                                    TSPlayer.All.SendMessage(b.message, b.r, b.g, b.b);
                                     lastmsgupdate = DateTime.Now;
                                 }
                             }

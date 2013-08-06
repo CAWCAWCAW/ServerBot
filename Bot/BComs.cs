@@ -101,8 +101,7 @@ namespace Bot
                     {
                         string message = string.Format("{0}: {1}", b.Name, text);
 
-                        b.msgcol = new Color(b.r, b.g, b.b);
-                        TSPlayer.All.SendMessage(message, b.msgcol);
+                        TSPlayer.All.SendMessage(message, b.r, b.g, b.b);
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine(string.Format("{0}: {1}", b.Name, text));
                         if (text.StartsWith("/"))
@@ -265,6 +264,10 @@ namespace Bot
         public static void ReloadCfg(CommandArgs z)
         {
             Utils.SetUpConfig();
+            foreach (Bot b in BotMain.bots)
+            {
+            	b.trivia.LoadConfig(BotMain.TriviaSave);
+            }
             z.Player.SendWarningMessage("Reloaded Bot config");
         }
         #endregion
