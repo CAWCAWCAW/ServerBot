@@ -88,11 +88,16 @@ namespace Bot
 	                {
 	                    BotMain.bcfg.Write(BotMain.BotSave);
 	                }
+	                if (!File.Exists(BotMain.TriviaSave))
+                    {
+                    	new TriviaConfig().Write(BotMain.TriviaSave);
+                    }
             	}
             	else
             	{
             		Directory.CreateDirectory(Path.Combine(TShock.SavePath, "ServerBot"));
             		BotMain.bcfg.Write(BotMain.BotSave);
+            		new TriviaConfig().Write(BotMain.TriviaSave);
             	}
             }
             catch (Exception z)
@@ -205,7 +210,7 @@ namespace Bot
                         {
                             if (text.StartsWith(BotMain.bcfg.CommandChar))
                             {
-                                string[] words = text.Split();
+                            	string[] words = text.Split();
 
                                 #region Bot.HelpCmds
                                 if (words[1] == "help")
@@ -250,7 +255,7 @@ namespace Bot
                                     }
                                     else
                                     {
-                                        pl.SendMessage(string.Format("{0}: Sorry {1}, but you don't have permission to use kill", BotMain.bcfg.CommandBot, pl.Name), b.msgcol);
+                                        pl.SendMessage(string.Format("{0}: Sorry {1}, but you don't have permission to use kill", BotMain.bcfg.CommandBot, pl.Name), b.r, b.g, b.b);
                                         Log.Info(string.Format("{0} failed to use {1} on {2} because of lack of permissions.", pl.Name, words[1], words[2]));
                                     }
                                 }
@@ -353,7 +358,7 @@ namespace Bot
                                     }
                                     else
                                     {
-                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use ban.", pl.Name, BotMain.bcfg.CommandBot), b.msgcol);
+                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use ban.", pl.Name, BotMain.bcfg.CommandBot), b.r, b.g, b.b);
                                         Log.Info(string.Format("{0} failed to use {1} on {2} because of lack of permissions.", pl.Name, words[1], words[2]));
                                     }
                                 }
@@ -369,7 +374,7 @@ namespace Bot
                                     }
                                     else
                                     {
-                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use kick.", pl.Name, BotMain.bcfg.CommandBot), b.msgcol);
+                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use kick.", pl.Name, BotMain.bcfg.CommandBot), b.r, b.g, b.b);
                                         Log.Info(string.Format("{0} failed to use {1} on {2} because of lack of permissions.", pl.Name, words[1], words[2]));
                                     }
                                 }
@@ -386,7 +391,7 @@ namespace Bot
                                     }
                                     else
                                     {
-                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use mute.", pl.Name, BotMain.bcfg.CommandBot), b.msgcol);
+                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use mute.", pl.Name, BotMain.bcfg.CommandBot), b.r, b.g, b.b);
                                         Log.Info(string.Format("{0} failed to used {1} on {2} because of lack of permissions.", pl.Name, words[1], words[2]));
                                     }
                                 }
@@ -417,7 +422,7 @@ namespace Bot
                                     }
                                     else
                                     {
-                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use super kick.", pl.Name, BotMain.bcfg.CommandBot), b.msgcol);
+                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use super kick.", pl.Name, BotMain.bcfg.CommandBot), b.r, b.g, b.b);
                                         Log.Info(string.Format("{0} failed to use {1} on {2} because of lack of permissions.", pl.Name, words[1], words[2]));
                                     }
                                 }
@@ -433,7 +438,7 @@ namespace Bot
                                     }
                                     else
                                     {
-                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use super ban.", pl.Name, BotMain.bcfg.CommandBot), b.msgcol);
+                                        pl.SendMessage(string.Format("{1}: Sorry {0}, but you don't have permission to use super ban.", pl.Name, BotMain.bcfg.CommandBot), b.r, b.g, b.b);
                                         Log.Info(string.Format("{0} failed to use {1} on {2} because of lack of permissions.", pl.Name, words[1], words[2]));
                                     }
                                 }
@@ -628,6 +633,38 @@ namespace Bot
                                         }
                                     }
                                     return;
+                                }
+                                #endregion
+                                
+                                #region TriviaStarting
+                                if (words[1] == "starttrivia")
+                                {
+                                	if (words.Length > 2)
+                                	{
+	                                	int numq;
+	                                	if (!int.TryParse(words[2], out numq))
+	                                	{
+	                                		pl.SendMessage(string.Format("Bot {0}: You didn't provide a valid number of questions for the game.", b.Name), b.r, b.g, b.b);
+	                                		return;
+	                                	}
+	                                	b.trivia.StartGame(numq);
+	                                	return;
+                                	}
+                                	else
+                                	{
+                                		pl.SendMessage(string.Format("Bot {0}: Proper format of \"^ starttrivia\": ^ starttrivia <number of questions to ask>", b.Name), b.r, b.g, b.b);
+                                		return;
+                                	}
+                                }
+                                #endregion
+                                
+                                #region TriviaAnswering
+                                if (words[1] == "answer")
+                                {
+                                	if (b.trivia.OngoingGame)
+                                	{
+                                		b.trivia.CheckAnswer(string.Join(" ", words, 2, words.Length-2), pl.Name);
+                                	}
                                 }
                                 #endregion
                             }
