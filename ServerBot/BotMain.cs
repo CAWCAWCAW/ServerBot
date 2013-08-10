@@ -32,6 +32,7 @@ namespace ServerBot
         public static string servername { get; set; }
         public static BotCommandHandler Handler;
         public static Bot CommandBot;
+        public static string Swearwords { get; set; }
 
         public static IDbConnection db;
 
@@ -110,6 +111,9 @@ namespace ServerBot
             {
                 servername = TShock.Config.ServerNickname;
             }
+
+            Utils.GetSwears();
+
         }
         #endregion
 
@@ -237,6 +241,8 @@ namespace ServerBot
             {
             	Handler.HandleCommand(text, pl);
             }
+
+            Utils.CheckChat(text, pl);
         }
         #endregion
 

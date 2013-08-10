@@ -7,8 +7,8 @@ namespace ServerBot
 {
     public class TriviaConfig
     {
-    	public List<TriviaItem> TriviaItems = new List<TriviaItem>();
-
+        public List<TriviaItem> TriviaItems = new List<TriviaItem>();
+        public Dictionary<int, List<string>> RewardTiers = new Dictionary<int, List<string>>();
 
         public static TriviaConfig Read(string path)
         {

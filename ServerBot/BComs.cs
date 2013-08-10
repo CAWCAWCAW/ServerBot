@@ -40,14 +40,11 @@ namespace ServerBot
             else if (z.Parameters[0] == "join")
             {
                 string plyname = z.Player.Name;
-                name = z.Parameters[1].ToString();
-                id = BotMain.rid.Next(1, 256);
-                foreach (Bot b in BotMain.bots)
+                name = z.Parameters[1];
+                if (BotMain.bots.Count != 0)
                 {
-                    if (id == b.Index)
-                    {
-                        id = BotMain.rid.Next(1, 256);
-                    }
+                    z.Player.SendWarningMessage("You may only have one bot at a time");
+                    return;
                 }
                 BotMain.bots.Add(new Bot(id, name));
                 TSPlayer.All.SendInfoMessage(string.Format("Bot '{0}' was summoned by {1}", name, plyname));
@@ -112,37 +109,6 @@ namespace ServerBot
                         }
                         Console.ResetColor();
                     }
-                }
-            }
-            #endregion
-
-            #region Bot.List
-            else if (z.Parameters[0] == "list")
-            {
-                List<string> botList = new List<string>();
-                string botString = "";
-                foreach (Bot b in BotMain.bots)
-                {
-                    botList.Add(b.Name);
-                }
-                foreach (string s in botList)
-                {
-                    if (botString.Length == 0)
-                    {
-                        botString += s;
-                    }
-                    else if (botString.Length > 0)
-                    {
-                        botString += ", " + s;
-                    }
-                }
-                if (botString.Length == 0)
-                {
-                    z.Player.SendInfoMessage("There are currently no bots online.");
-                }
-                else
-                {
-                    z.Player.SendInfoMessage("Current bots: " + botString);
                 }
             }
             #endregion
@@ -235,6 +201,7 @@ namespace ServerBot
                     {
                         BotMain.db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", z.Parameters[1]);
                         z.Player.SendMessage(string.Format("Added {0} into the banned word list.", z.Parameters[1]), Color.CadetBlue);
+                        BotMain.Swearwords += z.Parameters[1];
                     }
                     else
                     {
@@ -250,6 +217,27 @@ namespace ServerBot
                     {
                         BotMain.db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
                         z.Player.SendMessage(string.Format("Deleted {0} from the banned word list.", z.Parameters[1]), Color.CadetBlue);
+                        string[] words = BotMain.Swearwords.Split(',');
+                        List<string> wordsR = new List<string>();
+                        foreach (string s in words)
+                        {
+                            wordsR.Add(s);
+                            if (s == z.Parameters[1])
+                            {
+                                wordsR.Remove(s);
+                            }
+                        }
+                        foreach (string s in wordsR)
+                        {
+                            if (BotMain.Swearwords.Count() == 0)
+                            {
+                                BotMain.Swearwords += s;
+                            }
+                            else
+                            {
+                                BotMain.Swearwords += "," + s;
+                            }
+                        }
                     }
                     else
                     {

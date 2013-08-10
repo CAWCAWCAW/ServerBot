@@ -53,7 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Data.Sqlite">
-      <HintPath>C:\Users\KassHuss\Desktop\Huss%27 Stuff\Games\Terraria\TShock 1.12\serverplugins\Mono.Data.Sqlite.dll</HintPath>
+      <HintPath>H:\Root\Updates\CleanServer\serverplugins\Mono.Data.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="MySql.Data">
       <HintPath>C:\Users\KassHuss\Desktop\Huss%27 Stuff\Games\Terraria\TShock 1.12\serverplugins\MySql.Data.dll</HintPath>
@@ -62,7 +62,7 @@
       <HintPath>C:\Users\KassHuss\Desktop\Huss%27 Stuff\Games\Terraria\TShock 1.12\serverplugins\MySql.Web.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Users\KassHuss\Desktop\Huss%27 Stuff\Games\Terraria\TShock 1.12\serverplugins\Newtonsoft.Json.dll</HintPath>
+      <HintPath>H:\Root\Updates\CleanServer\serverplugins\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -72,10 +72,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="TerrariaServer">
-      <HintPath>C:\Users\KassHuss\Desktop\Huss%27 Stuff\Games\Terraria\TShock 1.12\TerrariaServer.exe</HintPath>
+      <HintPath>H:\Root\Updates\CleanServer\TerrariaServer.exe</HintPath>
     </Reference>
     <Reference Include="TShockAPI">
-      <HintPath>C:\Users\KassHuss\Desktop\Huss%27 Stuff\Games\Terraria\TShock 1.12\serverplugins\TShockAPI.dll</HintPath>
+      <HintPath>H:\Root\Updates\CleanServer\serverplugins\TShockAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -93,10 +93,7 @@
     <Compile Include="Trivia\TriviaItem.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="BotCommandHandling" />
-    <Folder Include="Trivia" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

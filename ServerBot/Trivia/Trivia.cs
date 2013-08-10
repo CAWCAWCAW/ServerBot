@@ -73,6 +73,9 @@ namespace ServerBot
 			{
 				Master.Say("Congrats, {0}. You got the correct answer!", new object[]{player});
 				//TODO: Insert Prize code here.
+
+
+                
 				if (NumQuestionsAsked < NumQuestions)
 				{
 					AskQuestion();
