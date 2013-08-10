@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 # SharpDevelop 4.2.2.8818
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "Bot.csproj", "{266C5535-09A2-4A0E-8D2E-27C9E6ADBD75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerBot", "ServerBot.csproj", "{266C5535-09A2-4A0E-8D2E-27C9E6ADBD75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

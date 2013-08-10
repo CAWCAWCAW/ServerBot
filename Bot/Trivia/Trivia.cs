@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace Bot
+namespace ServerBot
 {
 	/// <summary>
 	/// Handles the trivia game for a bot.

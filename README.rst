@@ -1,5 +1,5 @@
 ========
-Bot Help
+ServerBot Help
 ========
 
 Commands
@@ -33,13 +33,13 @@ Command               Description
 ^ help- register
 ^ help- item
 ^ kill player         Kills player, if they're online and the person executing the bot command has the permission "kill"
-^ hi     |
-^ hello  |--          Causes the bot to reply to their greeting.
-^ Hi     |
-^ good  |
-^ Good  |--           Causes the bot to reply to the player's mood. 
-^ bad   |--           ^       ^   ^   ^   ^   ^   ^     ^       ^
-^ Bad   |
+^ hi      
+^ hello               Causes the bot to reply to their greeting.
+^ Hi      
+^ good   
+^ Good                Causes the bot to reply to the player's mood. 
+^ bad                 ^       ^   ^   ^   ^   ^   ^     ^       ^
+^ Bad    
 ^ hug player          Heals the selected player and sends a hug message
 ^ afk                 If the server is running AFK-Jail-Prison--More etc plugin, sends them to the afkzone
 ^ ban player          Bans player
@@ -47,13 +47,13 @@ Command               Description
 ^ mute player         Mutes player
 ^ skick player        Forcekicks player
 ^ sban player         Forcebans player
-^ commands  |--       Displays bot command list 
-^ cmds      |--       ^         ^    ^      ^
+^ commands            Displays bot command list 
+^ cmds                ^         ^    ^      ^
 ^ butcher             Attempts to kill all mobs. If player does not have permission "butcher", the chance of success is config defined.
 ^ How are you?        Causes the bot to reply a phrase about how it's feeling.
 ^ insult player       Makes the bot insult player
-^ g        |--        Nooby website finding system. Needs expanding
-^ google   |--        ^        ^       ^      ^       ^      ^
+^ g                   Nooby website finding system. Needs expanding
+^ google              ^        ^       ^      ^       ^      ^
 =================     ===================================================================================================================
 
 Config File

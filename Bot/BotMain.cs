@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
-using System.Threading;
-using System.Linq;
 using System.Text;
 using System.Data;
 using System.Net;
@@ -16,8 +13,7 @@ using TShockAPI;
 using Terraria;
 using Hooks;
 
-
-namespace Bot
+namespace ServerBot
 {
     [APIVersion(1, 12)]
     public class BotMain : TerrariaPlugin
@@ -35,13 +31,15 @@ namespace Bot
         public static Color RBC;
         public static int plycount = 0;
         public static string servername { get; set; }
+        public static BotCommandHandler Handler;
+        public static Bot CommandBot;
 
         public static IDbConnection db;
 
         #region Name, Version, Author, Description, Hooks
         public override string Name
         {
-            get { return "Bot"; }
+            get { return "ServerBot"; }
         }
 
         public override Version Version
@@ -100,6 +98,9 @@ namespace Bot
 
             Utils.SetUpConfig();
             Utils.SetUpDB();
+            Handler = new BotCommandHandler();
+            
+            CommandBot = new Bot(1, bcfg.CommandBot);
 
             if (TShock.Config.UseServerName)
             {
@@ -126,7 +127,7 @@ namespace Bot
                     lock (bots)
                     {
                         Random r = new Random();
-                        int z = r.Next(1, 256);
+                        int z = r.Next(2, 256);
                         {
                             bots.Add(new Bot(z, bcfg.OnjoinBot));
                             foreach (Bot b in bots)
@@ -235,7 +236,10 @@ namespace Bot
                 }
             }
 
-            Utils.CheckChat(text, pl, e);
+            if (BotCommandHandler.CheckForBotCommand(text))
+            {
+            	Handler.HandleCommand(text, pl);
+            }
         }
         #endregion
 
@@ -250,18 +254,18 @@ namespace Bot
                 {
                     foreach (Bot b in bots)
                     {
-                        if (b.msgtime != 0)
+                        if (b.Msgtime != 0)
                         {
-                            if ((now - lastmsgupdate).TotalMinutes >= b.msgtime)
+                            if ((now - lastmsgupdate).TotalMinutes >= b.Msgtime)
                             {
-                                if (b.type == "asay")
+                                if (b.Type == "asay")
                                 {
                                     botmessagers++;
-                                    if (b.message.StartsWith("/"))
+                                    if (b.Message.StartsWith("/"))
                                     {
-                                        Commands.HandleCommand(TShockAPI.TSPlayer.Server, b.message);
+                                        Commands.HandleCommand(TShockAPI.TSPlayer.Server, b.Message);
                                     }
-                                    TSPlayer.All.SendMessage(b.message, b.r, b.g, b.b);
+                                    TSPlayer.All.SendMessage(b.Message, b.r, b.g, b.b);
 
                                     lastmsgupdate = DateTime.Now;
                                     return;
@@ -272,10 +276,10 @@ namespace Bot
                         {
                             if ((now - lastmsgupdate).TotalMinutes >= 1)
                             {
-                                if (b.type == "asay")
+                                if (b.Type == "asay")
                                 {
                                     botmessagers++;
-                                    TSPlayer.All.SendMessage(b.message, b.r, b.g, b.b);
+                                    TSPlayer.All.SendMessage(b.Message, b.r, b.g, b.b);
                                     lastmsgupdate = DateTime.Now;
                                 }
                             }

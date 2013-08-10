@@ -16,7 +16,7 @@ using TShockAPI;
 using Terraria;
 using Hooks;
 
-namespace Bot
+namespace ServerBot
 {
     public class Utils
     {
@@ -647,7 +647,7 @@ namespace Bot
 	                                		pl.SendMessage(string.Format("Bot {0}: You didn't provide a valid number of questions for the game.", b.Name), b.r, b.g, b.b);
 	                                		return;
 	                                	}
-	                                	b.trivia.StartGame(numq);
+	                                	b.Trivia.StartGame(numq);
 	                                	return;
                                 	}
                                 	else
@@ -661,9 +661,9 @@ namespace Bot
                                 #region TriviaAnswering
                                 if (words[1] == "answer")
                                 {
-                                	if (b.trivia.OngoingGame)
+                                	if (b.Trivia.OngoingGame)
                                 	{
-                                		b.trivia.CheckAnswer(string.Join(" ", words, 2, words.Length-2), pl.Name);
+                                		b.Trivia.CheckAnswer(string.Join(" ", words, 2, words.Length-2), pl.Name);
                                 	}
                                 }
                                 #endregion
@@ -699,12 +699,36 @@ namespace Bot
         	Console.ForegroundColor = clr;
         	Console.WriteLine(message);
         	Console.ResetColor();
+        	Log.Info(message);
         }
         public static void LogToConsole(ConsoleColor clr, string message, object[] objs)
         {
         	Console.ForegroundColor = clr;
         	Console.WriteLine(message, objs);
         	Console.ResetColor();
+        	Log.Info(string.Format(message, objs));
+        }
+        #endregion
+        
+        #region RegisterBuiltinCommands
+        public static void RegisterBuiltinCommands()
+        {
+        	BotMain.Handler.RegisterCommand("help", BuiltinBotCommands.BotHelp);
+        	BotMain.Handler.RegisterCommand("kill", BuiltinBotCommands.BotKill);
+        	BotMain.Handler.RegisterCommand("hi", BuiltinBotCommands.BotGreet);
+        	BotMain.Handler.RegisterCommand("good", BuiltinBotCommands.BotResponseGood);
+        	BotMain.Handler.RegisterCommand("bad", BuiltinBotCommands.BotResponseBad);
+        	BotMain.Handler.RegisterCommand("hug", BuiltinBotCommands.BotHug);
+        	BotMain.Handler.RegisterCommand("ban", BuiltinBotCommands.BotBan);
+        	BotMain.Handler.RegisterCommand("kick", BuiltinBotCommands.BotKick);
+        	BotMain.Handler.RegisterCommand("mute", BuiltinBotCommands.BotMute);
+        	BotMain.Handler.RegisterCommand("unmute", BuiltinBotCommands.BotUnmute);
+        	BotMain.Handler.RegisterCommand("butcher", BuiltinBotCommands.BotButcher);
+        	BotMain.Handler.RegisterCommand(new List<string>(){"How are you?", "how are you?", "how are you"}, BuiltinBotCommands.BotHowAreYou);
+        	BotMain.Handler.RegisterCommand("insult", BuiltinBotCommands.BotInsult);
+        	//BotMain.Handler.RegisterCommand(new List<string>(){"g", "google"}, BuiltinBotCommands.BotWebsite);
+        	BotMain.Handler.RegisterCommand("starttrivia", BuiltinBotCommands.BotTriviaStart);
+        	BotMain.Handler.RegisterCommand("answer", BuiltinBotCommands.BotTriviaAnswer);
         }
         #endregion
     }

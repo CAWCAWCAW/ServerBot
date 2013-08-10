@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Bot")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("ServerBot")]
+[assembly: AssemblyDescription("Server Bot for Terraria servers using the TerrariaServerAPI")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Bot")]
+[assembly: AssemblyProduct("ServerBot")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -16,7 +16,7 @@ using TShockAPI;
 using Terraria;
 using Hooks;
 
-namespace Bot
+namespace ServerBot
 {
     public class BComs
     {
@@ -188,14 +188,14 @@ namespace Bot
                 {
                     if (b.Name == z.Parameters[1])
                     {
-                        b.msgtime = Convert.ToInt32(z.Parameters[3]);
-                        b.message = string.Format("{0}: {1}", b.Name, z.Parameters[2]);
-                        z.Player.SendSuccessMessage(string.Format("Bot '{0}' will now broadcast your message every {1} minute(s).", b.Name, b.msgtime));
-                        b.type = "asay";
+                        b.Msgtime = Convert.ToInt32(z.Parameters[3]);
+                        b.Message = string.Format("{0}: {1}", b.Name, z.Parameters[2]);
+                        z.Player.SendSuccessMessage(string.Format("Bot '{0}' will now broadcast your message every {1} minute(s).", b.Name, b.Msgtime));
+                        b.Type = "asay";
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine(string.Format("{0} set bot '{1}' to broadcast a message every {2} minute(s)", z.Player.Name, b.Name, b.msgtime));
+                        Console.WriteLine(string.Format("{0} set bot '{1}' to broadcast a message every {2} minute(s)", z.Player.Name, b.Name, b.Msgtime));
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine(string.Format("Message: {0}", b.message));
+                        Console.WriteLine(string.Format("Message: {0}", b.Message));
                         Console.ResetColor();
                     }
                 }        
@@ -206,9 +206,9 @@ namespace Bot
                 {
                     if (b.Name == z.Parameters[1])
                     {
-                        b.msgtime = -1;
-                        b.message = string.Empty;
-                        b.type = "";
+                        b.Msgtime = -1;
+                        b.Message = string.Empty;
+                        b.Type = "";
                         z.Player.SendSuccessMessage(string.Format("Removed bot {0}'s timed message.", b.Name));
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine(string.Format("{0} removed bot {1}'s broadcast message ", z.Player.Name, b.Name));
@@ -266,7 +266,7 @@ namespace Bot
             Utils.SetUpConfig();
             foreach (Bot b in BotMain.bots)
             {
-            	b.trivia.LoadConfig(BotMain.TriviaSave);
+            	b.Trivia.LoadConfig(BotMain.TriviaSave);
             }
             z.Player.SendWarningMessage("Reloaded Bot config");
         }

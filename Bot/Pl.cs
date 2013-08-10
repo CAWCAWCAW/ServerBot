@@ -5,7 +5,7 @@ using System.Text;
 using Terraria;
 using TShockAPI;
 
-namespace Bot
+namespace ServerBot
 {
     public class Pl
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bot
+namespace ServerBot
 {
 	public struct TriviaItem
 	{
