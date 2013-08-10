@@ -1,0 +1,8 @@
+﻿* CommandBot is an actual bot now.
+* Bot no longer echoes commands. When a player uses a bot command, it is silent.
+	* Nevermind it's actually pretty necessary.
+* Added new command handler.
+* Moving commands to new command handler.
+* Removed "^ help" but kept "^ help item" and "^ help register"
+* Added Bot.Private method to say something to a specific player.
+* Utils.LogToConsole also logs to log file now so that I don't have to repeat Log.Info every 5 seconds.
