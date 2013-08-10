@@ -43,10 +43,7 @@ namespace ServerBot
         /// <param name="objs">Objects to be formatted into the string.</param>
         public void Say(string msg, object[] objs)
         {
-        	List<object> listObj = objs.ToList();
-        	listObj.Insert(0, Name);
-        	objs = listObj.ToArray();
-        	TSPlayer.All.SendMessage(string.Format("{0}: " + msg, objs), r, g, b);
+        	TSPlayer.All.SendMessage(string.Format("{0}: {1}", Name, string.Format(msg, objs)), r, g, b);
         }
         
         /// <summary>
@@ -67,10 +64,7 @@ namespace ServerBot
         /// <param name="objs">Objects to be formatted into the string.</param>
         public void Private(TSPlayer player, string msg, object[] objs)
         {
-        	List<object> listObj = objs.ToList();
-        	listObj.Insert(0, Name);
-        	objs = listObj.ToArray();
-        	player.SendMessage(string.Format("{0}: " + msg, objs), r, g, b);
+        	player.SendMessage(string.Format("{0}: {1}", Name, string.Format(msg, objs)), r, g, b);
         }
     }
 }

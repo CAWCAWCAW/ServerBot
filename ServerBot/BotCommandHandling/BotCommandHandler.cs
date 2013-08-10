@@ -20,8 +20,10 @@ namespace ServerBot
 		{
 			string[] split = message.Split(' ');
 			List<string> parms = new List<string>();
+			
 			parms.AddRange(split);
 			string name = parms[1];
+			
 			parms.RemoveRange(0,2);
 			BotCommandArgs args = new BotCommandArgs(name, parms, BotMain.CommandBot, ply);
 			foreach (BotCommand com in Commands)

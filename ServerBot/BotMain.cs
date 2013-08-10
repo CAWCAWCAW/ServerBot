@@ -28,7 +28,6 @@ namespace ServerBot
         public static DateTime lastswearupdate = DateTime.Now;
         public static Random rid = new Random();
         public static string IP { get; set; }
-        public static Color RBC;
         public static int plycount = 0;
         public static string servername { get; set; }
         public static BotCommandHandler Handler;
@@ -99,6 +98,7 @@ namespace ServerBot
             Utils.SetUpConfig();
             Utils.SetUpDB();
             Handler = new BotCommandHandler();
+            Utils.RegisterBuiltinCommands();
             
             CommandBot = new Bot(1, bcfg.CommandBot);
 
@@ -208,19 +208,16 @@ namespace ServerBot
         }
         #endregion
 
-        #region Bot.OnChatCmds
+        #region Bot.OnChat
         public void OnChat(messageBuffer msg, int who, string text, HandledEventArgs e)
         {
             TSPlayer pl = TShock.Players[msg.whoAmI];
-
+            
             if (pl == null)
             {
-                e.Handled = true;
                 return;
             }
-            if (e.Handled)
-                return;
-
+            
             if (text == "/")
             {
                 if (bcfg.EnableSnark)
@@ -235,7 +232,7 @@ namespace ServerBot
                     return;
                 }
             }
-
+            
             if (BotCommandHandler.CheckForBotCommand(text))
             {
             	Handler.HandleCommand(text, pl);

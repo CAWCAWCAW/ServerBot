@@ -689,7 +689,7 @@ namespace ServerBot
             { greet = string.Format("{0}: Well hello there, {1}, I'm {0}, and this is {2}!", BotMain.bcfg.OnjoinBot, pl.Name, BotMain.servername); }
             if (msg== 4)
             { greet = string.Format("{0}: Hi there {1}! I hope you enjoy your stay", BotMain.bcfg.OnjoinBot, pl.Name); }
-            pl.SendMessage(greet, BotMain.RBC);
+            pl.SendMessage(greet, BotMain.CommandBot.r, BotMain.CommandBot.g, BotMain.CommandBot.b);
         }
         #endregion
         
@@ -724,7 +724,7 @@ namespace ServerBot
         	BotMain.Handler.RegisterCommand("mute", BuiltinBotCommands.BotMute);
         	BotMain.Handler.RegisterCommand("unmute", BuiltinBotCommands.BotUnmute);
         	BotMain.Handler.RegisterCommand("butcher", BuiltinBotCommands.BotButcher);
-        	BotMain.Handler.RegisterCommand(new List<string>(){"How are you?", "how are you?", "how are you"}, BuiltinBotCommands.BotHowAreYou);
+        	//BotMain.Handler.RegisterCommand(new List<string>(){"How are you?", "how are you?", "how are you"}, BuiltinBotCommands.BotHowAreYou);
         	BotMain.Handler.RegisterCommand("insult", BuiltinBotCommands.BotInsult);
         	//BotMain.Handler.RegisterCommand(new List<string>(){"g", "google"}, BuiltinBotCommands.BotWebsite);
         	BotMain.Handler.RegisterCommand("starttrivia", BuiltinBotCommands.BotTriviaStart);

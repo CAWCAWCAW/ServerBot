@@ -62,7 +62,7 @@ namespace ServerBot
 		public static void BotGreet(BotCommandArgs args)
 		{
 			args.Bot.Say("Hello {1}, how are you?", new object[]{args.Player.Name});
-			Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: hi", new object[]{args.Player.Name, BotMain.bcfg.CommandChar});
+			Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: hi", new object[]{args.Player.Name, args.Bot.Name});
 		}
 		#endregion
 		
@@ -91,7 +91,7 @@ namespace ServerBot
 					args.Bot.Say("I'm always happiest with good friends... And lots of alcohol. Want to join me?");
 					break;
 			}
-			Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: good", new object[]{args.Player, BotMain.CommandBot.Name});			
+			Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: good", new object[]{args.Player.Name, args.Bot.Name});			
 		}
 		#endregion
 		
@@ -129,7 +129,7 @@ namespace ServerBot
 					args.Bot.Say("Feeling down eh? What you need is a cat.");
 					break;
 			}
-			Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: bad", new object[]{args.Player, BotMain.CommandBot.Name});
+			Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: bad", new object[]{args.Player.Name, args.Bot.Name});
 		}
 		#endregion
 		
@@ -146,7 +146,7 @@ namespace ServerBot
 	        {
 	            args.Player.GiveItem(star.type, star.name, star.width, star.height, star.maxStack);
 	        }
-	        args.Bot.Say("*{1} hugs {0}", new object[]{args.Player.Name, BotMain.CommandBot.Name});	
+	        args.Bot.Say("*{1} hugs {0}", new object[]{args.Player.Name, args.Bot.Name});	
 		}
 		#endregion
 		
@@ -161,7 +161,7 @@ namespace ServerBot
 			if (args.Player.Group.HasPermission("ban"))
 			{
 				TShock.Utils.Ban(target, BotMain.CommandBot.Name + " ban", false, null);
-				Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: ban on {2}", new object[]{args.Player.Name, BotMain.CommandBot.Name, target.Name});
+				Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: ban on {2}", new object[]{args.Player.Name, args.Bot.Name, target.Name});
 			}
 			else
 			{
@@ -308,6 +308,7 @@ namespace ServerBot
             { args.Bot.Say("{0}... You remind me of someone named {1}.", new object[]{plr, BotMain.bcfg.GenericInsultName}); }
             if (p == 10)
             { args.Bot.Say("Don't tell me what to do, {0}!", new object[]{args.Player.Name}); }
+            Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: insult on {2}", new object[]{args.Player.Name, args.Bot.Name, plr});
         }		
 		#endregion
 		
