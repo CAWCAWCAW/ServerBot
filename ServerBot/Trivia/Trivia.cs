@@ -52,6 +52,7 @@ namespace ServerBot
 			NumQuestionsAsked = 0;
 			Master.Say("A Trivia game is about to start. I'll ask you questions and you use the \"^ answer\" bot command to answer me!");
 			Master.Say("If you answer the question correctly then you'll be rewarded with a prize!");
+			AskQuestion();
 		}
 		
 		public void AskQuestion()
@@ -70,17 +71,19 @@ namespace ServerBot
 		{
 			if (CurrentQuestion.Answer.ToLower() == ans.ToLower())
 			{
-				Master.Say("Congrats, {0}. You got the correct answer!");
+				Master.Say("Congrats, {0}. You got the correct answer!", new object[]{player});
 				//TODO: Insert Prize code here.
 				if (NumQuestionsAsked < NumQuestions)
 				{
 					AskQuestion();
 				}
-				Master.Say("The Trivia game has ended. Thank you all for participating.");
-				OngoingGame = false;
-				
-				UnaskedQuestions.Clear();
-				UnaskedQuestions.AddRange(Config.TriviaItems);
+				else
+				{
+					Master.Say("The Trivia game has ended. Thank you all for participating.");
+					OngoingGame = false;
+					UnaskedQuestions.Clear();
+					UnaskedQuestions.AddRange(Config.TriviaItems);
+				}
 			}
 		}
 	}

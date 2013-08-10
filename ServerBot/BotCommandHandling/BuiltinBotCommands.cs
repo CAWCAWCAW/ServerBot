@@ -315,7 +315,7 @@ namespace ServerBot
 		#region BotTriviaStart
 		public static void BotTriviaStart(BotCommandArgs args)
 		{
-			if (args.Parameters.Count > 01)
+			if (args.Parameters.Count > 0)
 			{
 		    	int numq;
 		    	if (!int.TryParse(args.Parameters[0], out numq))

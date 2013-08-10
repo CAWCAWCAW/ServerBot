@@ -7,10 +7,7 @@ namespace ServerBot
 {
     public class TriviaConfig
     {
-    	public List<TriviaItem> TriviaItems = new List<TriviaItem>() {
-    		new TriviaItem("Enter your question here.", "Enter your answer here."), 
-    		new TriviaItem("Here is another example question.", "And another example answer.")
-    	};
+    	public List<TriviaItem> TriviaItems = new List<TriviaItem>();
 
 
         public static TriviaConfig Read(string path)
@@ -28,8 +25,6 @@ namespace ServerBot
             using (var sr = new StreamReader(stream))
             {
                 var cf = JsonConvert.DeserializeObject<TriviaConfig>(sr.ReadToEnd());
-                if (ConfigRead != null)
-                    ConfigRead(cf);
                 return cf;
             }
         }
@@ -50,7 +45,5 @@ namespace ServerBot
                 sw.Write(str);
             }
         }
-
-        public static Action<TriviaConfig> ConfigRead;
     }
 }
