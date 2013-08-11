@@ -32,7 +32,7 @@ namespace ServerBot
         public static string servername { get; set; }
         public static BotCommandHandler Handler;
         public static Bot CommandBot;
-        public static string Swearwords { get; set; }
+        public static List<string> Swearwords = new List<string>();
 
         public static IDbConnection db;
 

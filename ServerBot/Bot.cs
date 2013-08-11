@@ -33,7 +33,7 @@ namespace ServerBot
         /// <param name="msg">What the bot should say.</param>
         public void Say(string msg)
         {
-        	TSPlayer.All.SendMessage(string.Format("Bot {0}: {1}", Name, msg), r, g, b);
+        	TSPlayer.All.SendMessage(string.Format("[Bot] {0}: {1}", Name, msg), r, g, b);
         }
         
         /// <summary>
@@ -43,7 +43,7 @@ namespace ServerBot
         /// <param name="objs">Objects to be formatted into the string.</param>
         public void Say(string msg, object[] objs)
         {
-        	TSPlayer.All.SendMessage(string.Format("{0}: {1}", Name, string.Format(msg, objs)), r, g, b);
+        	TSPlayer.All.SendMessage(string.Format("[Bot] {0}: {1}", Name, string.Format(msg, objs)), r, g, b);
         }
         
         /// <summary>
@@ -53,7 +53,7 @@ namespace ServerBot
         /// <param name="msg">What the bot should say.</param>
         public void Private(TSPlayer player, string msg)
         {
-        	player.SendMessage(string.Format("{0}: {1}", Name, msg), r, g, b);
+        	player.SendMessage(string.Format("[Bot] {0}: {1}", Name, msg), r, g, b);
         }
         
         /// <summary>
@@ -64,7 +64,7 @@ namespace ServerBot
         /// <param name="objs">Objects to be formatted into the string.</param>
         public void Private(TSPlayer player, string msg, object[] objs)
         {
-        	player.SendMessage(string.Format("{0}: {1}", Name, string.Format(msg, objs)), r, g, b);
+        	player.SendMessage(string.Format("[Bot] {0}: {1}", Name, string.Format(msg, objs)), r, g, b);
         }
     }
 }

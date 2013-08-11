@@ -25,7 +25,7 @@ namespace ServerBot
         {
             if (TShock.Config.StorageType.ToLower() == "sqlite")
             {
-                BotMain.db = new SqliteConnection(string.Format("uri=file://{0},Version=3", Path.Combine(TShock.SavePath, "Bot.sqlite")));
+                BotMain.db = new SqliteConnection(string.Format("uri=file://{0},Version=3", Path.Combine(TShock.SavePath, "ServerBot/ServerBot.sqlite")));
             }
             else if (TShock.Config.StorageType.ToLower() == "mysql")
             {
@@ -114,50 +114,50 @@ namespace ServerBot
             #region Swearblocker
             if (BotMain.bcfg.EnableSwearBlocker)
             {
-                    foreach (Pl p in BotMain.players)
+                foreach (Pl p in BotMain.players)
+                {
+                    if (p.PlayerName == pl.Name)
                     {
-                        if (p.PlayerName == pl.Name)
+                        if (!text.StartsWith("^"))
                         {
-                            if (!text.StartsWith("/"))
+                            var parts = text.Split();
+                            foreach (string s in parts)
                             {
-                                var parts = text.Split();
-                                foreach (string s in parts)
+                                if (BotMain.Swearwords.Contains(s.ToLower()))
                                 {
-                                    if (BotMain.Swearwords.ToLower().Contains(s.ToLower()))
+                                    if (BotMain.bcfg.SwearBlockAction == "kick")
                                     {
-                                        if (BotMain.bcfg.SwearBlockAction == "kick")
+                                        p.scount++;
+                                        p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}", p.scount));
+                                        if (p.scount >= BotMain.bcfg.SwearBlockChances)
                                         {
-                                            p.scount++;
-                                            p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}", p.scount));
-                                            if (p.scount >= BotMain.bcfg.SwearBlockChances)
-                                            {
-                                                TShock.Utils.ForceKick(pl, "Swearing", false, false);
-                                                p.scount = 0;
-                                            }
+                                            TShock.Utils.ForceKick(pl, "Swearing", false, false);
+                                            p.scount = 0;
                                         }
-                                        else if (BotMain.bcfg.SwearBlockAction == "mute")
+                                    }
+                                    else if (BotMain.bcfg.SwearBlockAction == "mute")
+                                    {
+                                        p.scount++;
+                                        p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}/{1}", p.scount, BotMain.bcfg.SwearBlockChances));
+                                        if (p.scount >= BotMain.bcfg.SwearBlockChances)
                                         {
-                                            p.scount++;
-                                            p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}/{1}", p.scount, BotMain.bcfg.SwearBlockChances));
-                                            if (p.scount >= BotMain.bcfg.SwearBlockChances)
-                                            {
-                                                pl.mute = true;
-                                                pl.SendWarningMessage("You have been muted for swearing!");
-                                                p.scount = 0;
-                                            }
+                                            pl.mute = true;
+                                            pl.SendWarningMessage("You have been muted for swearing!");
+                                            p.scount = 0;
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                }
             }
             #endregion
 
             #region YoloSwagDeath
-            if (!text.StartsWith("/"))
+            if (BotMain.bcfg.EnableYoloSwagBlock)
             {
-                if (BotMain.bcfg.EnableYoloSwagBlock)
+                if (!text.StartsWith("/") || !text.StartsWith("^"))
                 {
                     if (text.ToLower().Contains("yolo") || text.ToLower().Contains("y.o.l.o"))
                     {
@@ -207,15 +207,15 @@ namespace ServerBot
         {
             string greet = "";
             if (msg == 0)
-            { greet = string.Format("{0}: Hi {1}, welcome to {2}!", BotMain.bcfg.OnjoinBot, pl.Name, TShock.Config.ServerNickname); }
+            { greet = string.Format("[Bot] {0}: Hi {1}, welcome to {2}!", BotMain.bcfg.OnjoinBot, pl.Name, TShock.Config.ServerNickname); }
             if (msg == 1)
-            { greet = string.Format("{0}: Welcome to the land of amaaaaziiiiinnnng, {1}", BotMain.bcfg.OnjoinBot, pl.Name); }
+            { greet = string.Format("[Bot] {0}: Welcome to the land of amaaaaziiiiinnnng, {1}", BotMain.bcfg.OnjoinBot, pl.Name); }
             if (msg == 2)
-            { greet = string.Format("{0}: Hallo there, {1}", BotMain.bcfg.OnjoinBot, pl.Name); }
+            { greet = string.Format("[Bot] {0}: Hallo there, {1}", BotMain.bcfg.OnjoinBot, pl.Name); }
             if (msg == 3)
-            { greet = string.Format("{0}: Well hello there, {1}, I'm {0}, and this is {2}!", BotMain.bcfg.OnjoinBot, pl.Name, BotMain.servername); }
+            { greet = string.Format("[Bot] {0}: Well hello there, {1}, I'm {0}, and this is {2}!", BotMain.bcfg.OnjoinBot, pl.Name, BotMain.servername); }
             if (msg== 4)
-            { greet = string.Format("{0}: Hi there {1}! I hope you enjoy your stay", BotMain.bcfg.OnjoinBot, pl.Name); }
+            { greet = string.Format("[Bot] {0}: Hi there {1}! I hope you enjoy your stay", BotMain.bcfg.OnjoinBot, pl.Name); }
             pl.SendMessage(greet, BotMain.CommandBot.r, BotMain.CommandBot.g, BotMain.CommandBot.b);
         }
         #endregion
@@ -256,24 +256,30 @@ namespace ServerBot
         	//BotMain.Handler.RegisterCommand(new List<string>(){"g", "google"}, BuiltinBotCommands.BotWebsite);
         	BotMain.Handler.RegisterCommand("starttrivia", BuiltinBotCommands.BotTriviaStart);
         	BotMain.Handler.RegisterCommand("answer", BuiltinBotCommands.BotTriviaAnswer);
+            BotMain.Handler.RegisterCommand("badwords", BuiltinBotCommands.BotBadWords);
+            BotMain.Handler.RegisterCommand("reload", BuiltinBotCommands.BotReloadCfg);
         }
         #endregion
 
         #region GetSwears
         public static void GetSwears()
         {
+            string swears = "";
             using (var reader = BotMain.db.QueryReader("SELECT * FROM BotSwear"))
             {
                 while (reader.Read())
                 {
                     try
                     {
-                        BotMain.Swearwords = reader.Get<string>("SwearBlock");
+                        swears = reader.Get<string>("SwearBlock");
+
+                        string[] words = swears.Split(',');
+                        foreach (string s in words)
+                        {
+                            BotMain.Swearwords.Add(s.ToLower());
+                        }
                     }
-                    catch
-                    {
-                        BotMain.Swearwords = string.Empty;
-                    }
+                    catch { }
                 }
             }
         }

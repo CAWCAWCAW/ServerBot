@@ -1,5 +1,6 @@
 ﻿using System;
 using TShockAPI;
+using TShockAPI.DB;
 using Terraria;
 using System.Collections.Generic;
 
@@ -13,23 +14,27 @@ namespace ServerBot
 		#region BotHelp
 		public static void BotHelp(BotCommandArgs args)
 		{
-			if (args.Parameters.Count > 1)
-			{
-				if (args.Parameters[0] == "register")
-				{
-	            	args.Bot.Say("To register, use /register <password>");
-	            	args.Bot.Say("<password> can be anything, and you define it personally.");
-	            	args.Bot.Say("Always remember to keep your password secure!");
-	            	Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: help register", new object[]{args.Player.Name, BotMain.CommandBot.Name});
-				}
-				else if (args.Parameters[0] == "item")
-				{
-		        	args.Bot.Say("To spawn any item, use the command /item");
-		        	args.Bot.Say("Items that are made of multiple words MUST be wrapped in quotes");
-		        	args.Bot.Say("Eg: /item \"hallowed repeater\"");
-		        	Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: help item", new object[]{args.Player.Name, BotMain.CommandBot.Name});
-				}
-			}
+            if (args.Parameters.Count == 1)
+            {
+                if (args.Parameters[0] == "register")
+                {
+                    args.Bot.Say("To register, use /register <password>");
+                    args.Bot.Say("<password> can be anything, and you define it personally.");
+                    args.Bot.Say("Always remember to keep your password secure!");
+                    Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: help register", new object[] { args.Player.Name, BotMain.CommandBot.Name });
+                }
+                else if (args.Parameters[0] == "item")
+                {
+                    args.Bot.Say("To spawn items, use the command /item");
+                    args.Bot.Say("Items that are made of multiple words MUST be wrapped in quotes");
+                    args.Bot.Say("Eg: /item \"hallowed repeater\"");
+                    Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: help item", new object[] { args.Player.Name, BotMain.CommandBot.Name });
+                }
+            }
+            else
+            {
+                args.Bot.Say("Whoops! Try using ^ help item or ^ help register");
+            }
 		}
 		#endregion
 		
@@ -45,7 +50,9 @@ namespace ServerBot
 				
 				if (args.Player.Group.HasPermission("kill"))
 				{
-					target.DamagePlayer(99999);
+					target.DamagePlayer(9999);
+                    target.TPlayer.dead = true;
+                    target.Dead = true;
 					args.Bot.Say("{1} just had me kill {2}!", new object[]{args.Player.Name, target.Name});
 					Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: kill on {2}", new object[]{args.Player.Name, BotMain.CommandBot.Name, target.Name});
 				}
@@ -61,8 +68,11 @@ namespace ServerBot
 		#region BotGreet
 		public static void BotGreet(BotCommandArgs args)
 		{
-			args.Bot.Say("Hello {1}, how are you?", new object[]{args.Player.Name});
-			Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: hi", new object[]{args.Player.Name, args.Bot.Name});
+            if (args.Parameters.Count > 0)
+            {
+                args.Bot.Say("Hello {1}, how are you?", new object[] { args.Player.Name });
+                Utils.LogToConsole(ConsoleColor.Cyan, "{0} used {1} to execute: hi", new object[] { args.Player.Name, args.Bot.Name });
+            }
 		}
 		#endregion
 		
@@ -343,5 +353,107 @@ namespace ServerBot
 			}
 		}
 		#endregion
-	}	
+
+        #region BotBadwords
+        public static void BotBadWords(BotCommandArgs args)
+        {
+            if (args.Parameters.Count > 1)
+            {
+                if (args.Parameters[0] == "add")
+                {
+                    using (var reader = BotMain.db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", args.Parameters[1]))
+                    {
+                        if (!reader.Read())
+                        {
+                            BotMain.db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", args.Parameters[1]);
+                            args.Player.SendMessage(string.Format("Added {0} into the banned word list.", args.Parameters[1]), Color.CadetBlue);
+                            BotMain.Swearwords.Add(args.Parameters[1].ToLower());
+                        }
+                        else
+                        {
+                            args.Player.SendWarningMessage(string.Format("{0} already exists in the swear list.", args.Parameters[1]));
+                        }
+                    }
+                }
+                else if (args.Parameters[0] == "del")
+                {
+                    using (var reader = BotMain.db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", args.Parameters[1]))
+                    {
+                        if (reader.Read())
+                        {
+                            BotMain.db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", args.Parameters[1]);
+                            args.Player.SendMessage(string.Format("Deleted {0} from the banned word list.", args.Parameters[1]), Color.CadetBlue);
+                            BotMain.Swearwords.Remove(args.Parameters[1].ToLower());
+                        }
+                        else
+                        {
+                            args.Player.SendWarningMessage(string.Format("{0} does not exist in the swear list.", args.Parameters[1]));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                args.Bot.Say("You didn't have a valid number of parameters; Use ^ badwords [add/del] \"word\"");
+                return;
+            }
+        }
+        #endregion
+
+        #region BotReloadCfg
+        public static void BotReloadCfg(BotCommandArgs args)
+        {
+            Utils.SetUpConfig();
+
+            foreach (Bot b in BotMain.bots)
+            {
+                b.Trivia.LoadConfig(BotMain.TriviaSave);
+            }
+            args.Player.SendWarningMessage("Reloaded Bot config");
+        }
+        #endregion
+
+        #region BotPlayerManagement
+        public static void KickPlayers(BotCommandArgs args)
+        {
+            if (args.Parameters.Count < 2)
+            {
+                args.Player.SendWarningMessage("You didn't have a valid number of parameters; Use ^ player [add/del] \"playername\"");
+            }
+            else
+            {
+                if (args.Parameters[0] == "add")
+                {
+                    using (var reader = BotMain.db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", args.Parameters[1]))
+                    {
+                        if (!reader.Read())
+                        {
+                            BotMain.db.Query("INSERT INTO BotKick (KickNames) VALUES (@0)", args.Parameters[1]);
+                            args.Player.SendMessage(string.Format("Added {0} to the playermanager list.", args.Parameters[1]), Color.CadetBlue);
+                        }
+                        else
+                        {
+                            args.Player.SendWarningMessage(string.Format("{0} already exists in the playermanager list!", args.Parameters[1]));
+                        }
+                    }
+                }
+                else if (args.Parameters[0] == "del")
+                {
+                    using (var reader = BotMain.db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", args.Parameters[1]))
+                    {
+                        if (reader.Read())
+                        {
+                            BotMain.db.Query("DELETE FROM BotKick WHERE KickNames = @0", args.Parameters[1]);
+                            args.Player.SendMessage(string.Format("Deleted {0} from the playermanager list!", args.Parameters[1]), Color.CadetBlue);
+                        }
+                        else
+                        {
+                            args.Player.SendWarningMessage(string.Format("{0} does not exist on the playermanager list!", args.Parameters[1]));
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+    }	
 }

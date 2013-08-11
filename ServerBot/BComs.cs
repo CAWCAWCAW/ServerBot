@@ -201,7 +201,7 @@ namespace ServerBot
                     {
                         BotMain.db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", z.Parameters[1]);
                         z.Player.SendMessage(string.Format("Added {0} into the banned word list.", z.Parameters[1]), Color.CadetBlue);
-                        BotMain.Swearwords += z.Parameters[1];
+                        BotMain.Swearwords.Add(z.Parameters[1].ToLower());
                     }
                     else
                     {
@@ -217,27 +217,7 @@ namespace ServerBot
                     {
                         BotMain.db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
                         z.Player.SendMessage(string.Format("Deleted {0} from the banned word list.", z.Parameters[1]), Color.CadetBlue);
-                        string[] words = BotMain.Swearwords.Split(',');
-                        List<string> wordsR = new List<string>();
-                        foreach (string s in words)
-                        {
-                            wordsR.Add(s);
-                            if (s == z.Parameters[1])
-                            {
-                                wordsR.Remove(s);
-                            }
-                        }
-                        foreach (string s in wordsR)
-                        {
-                            if (BotMain.Swearwords.Count() == 0)
-                            {
-                                BotMain.Swearwords += s;
-                            }
-                            else
-                            {
-                                BotMain.Swearwords += "," + s;
-                            }
-                        }
+                        BotMain.Swearwords.Remove(z.Parameters[1].ToLower());
                     }
                     else
                     {
