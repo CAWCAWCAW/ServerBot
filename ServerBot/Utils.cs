@@ -14,7 +14,8 @@ using MySql.Web;
 using TShockAPI.DB;
 using TShockAPI;
 using Terraria;
-using Hooks;
+using TerrariaApi;
+using TerrariaApi.Server;
 
 namespace ServerBot
 {

@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
+using System.Threading;
+using System.Linq;
 using System.Text;
 using System.Data;
 using System.Net;
@@ -11,11 +14,12 @@ using MySql.Web;
 using TShockAPI.DB;
 using TShockAPI;
 using Terraria;
-using Hooks;
+using TerrariaApi;
+using TerrariaApi.Server;
 
 namespace ServerBot
 {
-    [APIVersion(1, 12)]
+    [ApiVersion(1, 12)]
     public class BotMain : TerrariaPlugin
     {
         public static BotConfig bcfg { get; set; }
@@ -59,24 +63,28 @@ namespace ServerBot
 
         public override void Initialize()
         {
-            GameHooks.Initialize += OnInitialize;
-            ServerHooks.Join += OnJoin;
-            GameHooks.Update += OnUpdate;
-            ServerHooks.Chat += OnChat;
-            ServerHooks.Leave += OnLeave;
-            NetHooks.GreetPlayer += OnGreet;
+            var Hook = ServerApi.Hooks;
+
+            Hook.GameUpdate.Register(this, (args) => { OnUpdate(); });
+            Hook.GameInitialize.Register(this, (args) => { OnInitialize(); });
+            Hook.ServerJoin.Register(this, OnJoin);
+            Hook.ServerChat.Register(this, OnChat);
+            Hook.ServerLeave.Register(this, OnLeave);
+            Hook.NetGreetPlayer.Register(this, OnGreet);
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                GameHooks.Initialize -= OnInitialize;
-                GameHooks.Update -= OnUpdate;
-                ServerHooks.Chat -= OnChat;
-                ServerHooks.Join -= OnJoin;
-                ServerHooks.Leave -= OnLeave;
-                NetHooks.GreetPlayer -= OnGreet;
+                var Hook = ServerApi.Hooks;
+
+                Hook.GameUpdate.Deregister(this, (args) => { OnUpdate(); });
+                Hook.GameInitialize.Deregister(this, (args) => { OnInitialize(); });
+                Hook.ServerJoin.Deregister(this, OnJoin);
+                Hook.ServerChat.Deregister(this, OnChat);
+                Hook.ServerLeave.Deregister(this, OnLeave);
+                Hook.NetGreetPlayer.Deregister(this, OnGreet);
             }
             base.Dispose(disposing);
         }
@@ -118,10 +126,10 @@ namespace ServerBot
         #endregion
 
         #region Onjoin
-        public void OnJoin(int who, HandledEventArgs e)
+        public void OnJoin(JoinEventArgs args)
         {
             lock (players)
-                players.Add(new Pl(who));
+                players.Add(new Pl(args.Who));
 
             #region Bot.AutoJoining
             if (bcfg.EnableAutoJoin)
@@ -152,7 +160,7 @@ namespace ServerBot
             #endregion
 
             #region Bot.AutoKick, Bot.AutoBan
-            var ply = players[who];
+            var ply = players[args.Who];
             ply.kcount = 0;
             using (var reader = db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", ply.PlayerName))
             {
@@ -188,11 +196,11 @@ namespace ServerBot
         #endregion
 
         #region OnGreet
-        public void OnGreet(int who, HandledEventArgs e)
+        public void OnGreet(GreetPlayerEventArgs args)
         {
             if (bcfg.BotJoinMessage)
             {
-                var ply = TShock.Players[who];
+                var ply = TShock.Players[args.Who];
 
                 Random r = new Random();
                 var rand = r.Next(0,4);
@@ -203,32 +211,32 @@ namespace ServerBot
         #endregion
 
         #region OnLeave
-        public void OnLeave(int who)
+        public void OnLeave(LeaveEventArgs args)
         {
             lock (players)
             {
-                players.RemoveAll(plr => plr.Index == who);
+                players.RemoveAll(plr => plr.Index == args.Who);
             }
         }
         #endregion
 
         #region Bot.OnChat
-        public void OnChat(messageBuffer msg, int who, string text, HandledEventArgs e)
+        public void OnChat(ServerChatEventArgs args)
         {
-            TSPlayer pl = TShock.Players[msg.whoAmI];
+            TSPlayer pl = TShock.Players[args.Who];
             
             if (pl == null)
             {
                 return;
             }
             
-            if (text == "/")
+            if (args.Text == "/")
             {
                 if (bcfg.EnableSnark)
                 {
                     pl.SendWarningMessage("Correct. That is a command starter. Try writing an actual command now.");
 
-                    e.Handled = true;
+                    args.Handled = true;
                     return;
                 }
                 else
@@ -237,12 +245,12 @@ namespace ServerBot
                 }
             }
             
-            if (BotCommandHandler.CheckForBotCommand(text))
+            if (BotCommandHandler.CheckForBotCommand(args.Text))
             {
-            	Handler.HandleCommand(text, pl);
+            	Handler.HandleCommand(args.Text, pl);
             }
 
-            Utils.CheckChat(text, pl);
+            Utils.CheckChat(args.Text, pl);
         }
         #endregion
 
