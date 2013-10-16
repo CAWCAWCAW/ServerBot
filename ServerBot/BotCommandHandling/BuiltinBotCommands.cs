@@ -43,9 +43,12 @@ namespace ServerBot
 		{
 			if (args.Parameters.Count > 0)
 			{
-				List<TSPlayer> targets = TShock.Utils.FindPlayer(args.Parameters[0]);
-				if (targets.Count < 1)
-					return;
+				var targets = TShock.Utils.FindPlayer(args.Parameters[0]);
+                if (targets.Count < 1)
+                {
+                    TShock.Utils.SendMultipleMatchError(args.Player, targets);
+                    return;
+                }
 				TSPlayer target = targets[0];
 				
 				if (args.Player.Group.HasPermission("kill"))
@@ -108,7 +111,6 @@ namespace ServerBot
 		#region BotResponseBad
 		public static void BotResponseBad(BotCommandArgs args)
 		{
-			
 			Random response = new Random();
 			switch (response.Next(0, 4))
 			{
@@ -163,10 +165,13 @@ namespace ServerBot
 		#region BotBan
 		public static void BotBan(BotCommandArgs args)
 		{
-			List<TSPlayer> targets = TShock.Utils.FindPlayer(args.Parameters[0]);
-			if (targets.Count < 1)
-				return;
-			TSPlayer target = targets[0];
+            var targets = TShock.Utils.FindPlayer(args.Parameters[0]);
+            if (targets.Count < 1)
+            {
+                TShock.Utils.SendMultipleMatchError(args.Player, targets);
+                return;
+            }
+            TSPlayer target = targets[0];
 			
 			if (args.Player.Group.HasPermission("ban"))
 			{
@@ -184,8 +189,14 @@ namespace ServerBot
 		#region BotKick
 		public static void BotKick(BotCommandArgs args)
 		{
-			List<TSPlayer> player = TShock.Utils.FindPlayer(args.Parameters[0]);
-            TSPlayer plr = player[0];
+            var targets = TShock.Utils.FindPlayer(args.Parameters[0]);
+            if (targets.Count < 1)
+            {
+                TShock.Utils.SendMultipleMatchError(args.Player, targets);
+                return;
+            }
+            TSPlayer plr = targets[0];
+
 			if (args.Player.Group.HasPermission("kick"))
 			{
                 TShock.Utils.Kick(plr, args.Bot.Name + " forcekick", false, false, null, false);
@@ -202,8 +213,14 @@ namespace ServerBot
 		#region BotMute
 		public static void BotMute(BotCommandArgs args)
 		{
-			List<TSPlayer> player = TShock.Utils.FindPlayer(args.Parameters[0]);
-			TSPlayer plr = player[0];
+            var targets = TShock.Utils.FindPlayer(args.Parameters[0]);
+            if (targets.Count < 1)
+            {
+                TShock.Utils.SendMultipleMatchError(args.Player, targets);
+                return;
+            }
+            TSPlayer plr = targets[0];
+
 			if (args.Player.Group.HasPermission("mute"))
 			{
 				plr.mute = true;
@@ -220,8 +237,13 @@ namespace ServerBot
 		#region BotUnmute
 		public static void BotUnmute(BotCommandArgs args)
 		{
-			List<TSPlayer> player = TShock.Utils.FindPlayer(args.Parameters[0]);
-			TSPlayer plr = player[0];
+            var targets = TShock.Utils.FindPlayer(args.Parameters[0]);
+            if (targets.Count < 1)
+            {
+                TShock.Utils.SendMultipleMatchError(args.Player, targets);
+                return;
+            }
+            TSPlayer plr = targets[0];
 			
 			if (args.Player.Group.HasPermission("mute"))
 			{
@@ -295,8 +317,15 @@ namespace ServerBot
 		#region BotInsult
 		public static void BotInsult(BotCommandArgs args)
 		{
-			List<TSPlayer> ply = TShock.Utils.FindPlayer(args.Parameters[0]);
-            string plr = ply[0].Name;
+            var targets = TShock.Utils.FindPlayer(args.Parameters[0]);
+            if (targets.Count < 1)
+            {
+                TShock.Utils.SendMultipleMatchError(args.Player, targets);
+                return;
+            }
+
+            string plr = targets[0].Name;
+
             Random r = new Random();
             int p = r.Next(1, 10);
 
@@ -354,6 +383,7 @@ namespace ServerBot
 		}
 		#endregion
 
+        //Make all badwords .ToLower(), meaning that people can't avoid detection by changing case
         #region BotBadwords
         public static void BotBadWords(BotCommandArgs args)
         {
@@ -398,7 +428,7 @@ namespace ServerBot
                 return;
             }
         }
-        #endregion
+        #endregion    //Make all badwords .ToLower(), meaning that people can't avoid detection by changing case
 
         #region BotReloadCfg
         public static void BotReloadCfg(BotCommandArgs args)
@@ -413,6 +443,7 @@ namespace ServerBot
         }
         #endregion
 
+        //Make all players .ToLower(), meaning that people can't avoid detection by changing case
         #region BotPlayerManagement
         public static void KickPlayers(BotCommandArgs args)
         {

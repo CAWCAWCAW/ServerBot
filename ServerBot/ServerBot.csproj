@@ -8,7 +8,7 @@
     <ProjectGuid>{266C5535-09A2-4A0E-8D2E-27C9E6ADBD75}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bot</RootNamespace>
+    <RootNamespace>ServerBot</RootNamespace>
     <AssemblyName>ServerBot</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -56,10 +56,7 @@
       <HintPath>H:\Root\Updates\CleanServer\serverplugins\Mono.Data.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="MySql.Data">
-      <HintPath>C:\Users\KassHuss\Desktop\Huss%27 Stuff\Games\Terraria\TShock 1.12\serverplugins\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="MySql.Web">
-      <HintPath>C:\Users\KassHuss\Desktop\Huss%27 Stuff\Games\Terraria\TShock 1.12\serverplugins\MySql.Web.dll</HintPath>
+      <HintPath>..\..\..\..\TShock4.2.x\ServerPlugins\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>H:\Root\Updates\CleanServer\serverplugins\Newtonsoft.Json.dll</HintPath>
@@ -71,14 +68,14 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TerrariaServer, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="TerrariaServer, Version=1.14.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <ExecutableExtension>.exe</ExecutableExtension>
-      <HintPath>..\..\..\..\Desktop\TShock4.2.x\TerrariaServer.exe</HintPath>
+      <HintPath>..\..\BossSpawner2\BossSpawner2\BossSpawner2\bin\Release\TerrariaServer.exe</HintPath>
     </Reference>
-    <Reference Include="TShockAPI, Version=4.1.0.419, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="TShockAPI, Version=4.2.0.930, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Desktop\TShock4.2.x\ServerPlugins\TShockAPI.dll</HintPath>
+      <HintPath>..\..\BossSpawner2\BossSpawner2\BossSpawner2\bin\Release\TShockAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +86,7 @@
     <Compile Include="BotConfig.cs" />
     <Compile Include="BotMain.cs" />
     <Compile Include="BComs.cs" />
+    <Compile Include="CmdConfig.cs" />
     <Compile Include="Pl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Trivia\Trivia.cs" />

@@ -10,7 +10,6 @@ using System.IO;
 using System;
 using MySql.Data.MySqlClient;
 using Mono.Data.Sqlite;
-using MySql.Web;
 using TShockAPI.DB;
 using TShockAPI;
 using Terraria;
@@ -19,13 +18,15 @@ using TerrariaApi.Server;
 
 namespace ServerBot
 {
-    [ApiVersion(1, 12)]
+    [ApiVersion(1, 14)]
     public class BotMain : TerrariaPlugin
     {
         public static BotConfig bcfg { get; set; }
+        public static CmdConfig ccfg { get; set; }
         public WebRequest request;
         internal static string BotSave { get { return Path.Combine(TShock.SavePath, "ServerBot/BotConfig.json"); } }
         internal static string TriviaSave { get { return Path.Combine(TShock.SavePath, "ServerBot/TriviaConfig.json"); } }
+        internal static string BotCmdSave { get { return Path.Combine(TShock.SavePath, "ServerBot/BotCommands.json"); } }
         public static List<Bot> bots = new List<Bot>();
         public static List<Pl> players = new List<Pl>();
         public static DateTime lastmsgupdate = DateTime.Now;
@@ -65,8 +66,8 @@ namespace ServerBot
         {
             var Hook = ServerApi.Hooks;
 
-            Hook.GameUpdate.Register(this, (args) => { OnUpdate(); });
-            Hook.GameInitialize.Register(this, (args) => { OnInitialize(); });
+            Hook.GameUpdate.Register(this, OnUpdate);
+            Hook.GameInitialize.Register(this, OnInitialize);
             Hook.ServerJoin.Register(this, OnJoin);
             Hook.ServerChat.Register(this, OnChat);
             Hook.ServerLeave.Register(this, OnLeave);
@@ -79,8 +80,8 @@ namespace ServerBot
             {
                 var Hook = ServerApi.Hooks;
 
-                Hook.GameUpdate.Deregister(this, (args) => { OnUpdate(); });
-                Hook.GameInitialize.Deregister(this, (args) => { OnInitialize(); });
+                Hook.GameUpdate.Deregister(this, OnUpdate);
+                Hook.GameInitialize.Deregister(this, OnInitialize);
                 Hook.ServerJoin.Deregister(this, OnJoin);
                 Hook.ServerChat.Deregister(this, OnChat);
                 Hook.ServerLeave.Deregister(this, OnLeave);
@@ -97,7 +98,7 @@ namespace ServerBot
         #endregion
 
         #region OnInitialize
-        public void OnInitialize()
+        public void OnInitialize(EventArgs args)
         {
             Commands.ChatCommands.Add(new Command(new List<string>() { "bot.bot", "bot.*" }, BComs.BotMethod, "/bot"));
             Commands.ChatCommands.Add(new Command(new List<string>() { "bot.reload", "bot.*" }, BComs.ReloadCfg, "/botrld"));
@@ -121,12 +122,18 @@ namespace ServerBot
             }
 
             Utils.GetSwears();
-
         }
         #endregion
 
         #region Onjoin
         public void OnJoin(JoinEventArgs args)
+        {
+            
+        }
+        #endregion
+
+        #region OnGreet
+        public void OnGreet(GreetPlayerEventArgs args)
         {
             lock (players)
                 players.Add(new Pl(args.Who));
@@ -146,9 +153,9 @@ namespace ServerBot
                             {
                                 if (b.Name == bcfg.OnjoinBot)
                                 {
-                                	b.r = bcfg.OnjoinBotColourR;
-                                	b.g = bcfg.OnjoinBotColourG;
-                                	b.b = bcfg.OnjoinBotColourB;
+                                    b.r = bcfg.OnjoinBotColourR;
+                                    b.g = bcfg.OnjoinBotColourG;
+                                    b.b = bcfg.OnjoinBotColourB;
                                 }
                             }
                             plycount++;
@@ -192,20 +199,15 @@ namespace ServerBot
                 }
             }
             #endregion
-        }
-        #endregion
 
-        #region OnGreet
-        public void OnGreet(GreetPlayerEventArgs args)
-        {
             if (bcfg.BotJoinMessage)
             {
-                var ply = TShock.Players[args.Who];
+                var player = TShock.Players[args.Who];
 
                 Random r = new Random();
                 var rand = r.Next(0,4);
 
-                Utils.GreetMsg(ply, rand);
+                Utils.GreetMsg(player, rand);
             }
         }
         #endregion
@@ -255,7 +257,7 @@ namespace ServerBot
         #endregion
 
         #region OnUpdate
-        public void OnUpdate()
+        public void OnUpdate(EventArgs args)
         {
             DateTime now = DateTime.Now;
             lock (bots)

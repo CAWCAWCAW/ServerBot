@@ -17,6 +17,7 @@ namespace ServerBot
         public byte r = 255;
         public byte g = 255;
         public byte b = 255;
+        public Color color { get { return new Color(r, g, b); } }
         public Trivia Trivia;
 
         public Bot(int index, string name)

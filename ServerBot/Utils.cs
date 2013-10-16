@@ -10,7 +10,6 @@ using System.IO;
 using System;
 using MySql.Data.MySqlClient;
 using Mono.Data.Sqlite;
-using MySql.Web;
 using TShockAPI.DB;
 using TShockAPI;
 using Terraria;
@@ -76,30 +75,38 @@ namespace ServerBot
         #region SetUpConfig
         public static void SetUpConfig()
         {
-        	BotMain.bcfg = new BotConfig();
+            BotMain.bcfg = new BotConfig();
+            BotMain.ccfg = new CmdConfig();
+
             try
             {
-            	if (Directory.Exists(Path.Combine(TShock.SavePath, "ServerBot")))
-	            	{
-	                if (File.Exists(BotMain.BotSave))
-	                {
-	                    BotMain.bcfg = BotConfig.Read(BotMain.BotSave);
-	                }
-	                else
-	                {
-	                    BotMain.bcfg.Write(BotMain.BotSave);
-	                }
-	                if (!File.Exists(BotMain.TriviaSave))
+                if (Directory.Exists(Path.Combine(TShock.SavePath, "ServerBot")))
+                {
+                    if (File.Exists(BotMain.BotSave))
                     {
-                    	new TriviaConfig().Write(BotMain.TriviaSave);
+                        BotMain.bcfg = BotConfig.Read(BotMain.BotSave);
                     }
-            	}
-            	else
-            	{
-            		Directory.CreateDirectory(Path.Combine(TShock.SavePath, "ServerBot"));
-            		BotMain.bcfg.Write(BotMain.BotSave);
-            		new TriviaConfig().Write(BotMain.TriviaSave);
-            	}
+                    else
+                    {
+                        BotMain.bcfg.Write(BotMain.BotSave);
+                    }
+                    if (!File.Exists(BotMain.TriviaSave))
+                    {
+                        new TriviaConfig().Write(BotMain.TriviaSave);
+                    }
+
+                    if (File.Exists(BotMain.BotCmdSave))
+                        BotMain.ccfg = CmdConfig.Read(BotMain.BotCmdSave);
+                    else
+                        BotMain.ccfg.Write(BotMain.BotCmdSave);
+                }
+                else
+                {
+                    Directory.CreateDirectory(Path.Combine(TShock.SavePath, "ServerBot"));
+                    BotMain.bcfg.Write(BotMain.BotSave);
+                    BotMain.ccfg.Write(BotMain.BotCmdSave);
+                    new TriviaConfig().Write(BotMain.TriviaSave);
+                }
             }
             catch (Exception z)
             {
@@ -109,9 +116,48 @@ namespace ServerBot
         }
         #endregion
 
+        public static cBotCommand getcBotCommand(string text)
+        {
+            for (int i = 0; i < BotMain.ccfg.BotActions.Count; i++)
+            {
+                foreach (cBotCommand c in BotMain.ccfg.BotActions[i].botcommands)
+                {
+                    if (c.CommandName == text)
+                        return c;
+                }
+            }
+            return null;
+        }
+
         #region CheckChat
         public static void CheckChat(string text, TSPlayer pl)
         {
+            #region ConfigCommands
+            try
+            {
+                var command = getcBotCommand(text);
+                if (command != null)
+                {
+                    if (command.ReturnMessage.Length > 0)
+                    {
+                        if (!command.noisyCommand)
+                            pl.SendMessage(command.ReturnMessage, BotMain.CommandBot.color);
+                        else
+                            TSPlayer.All.SendMessage(command.ReturnMessage, BotMain.CommandBot.color);
+                    }
+
+                    if (command.CommandActions.Count > 0)
+                    {
+                        for (int i = 0; i < command.CommandActions.Count; i++)
+                        {
+                            Commands.HandleCommand(pl, command.CommandActions[i]);
+                        }
+                    }
+                }
+            }
+            catch { }
+            #endregion
+
             #region Swearblocker
             if (BotMain.bcfg.EnableSwearBlocker)
             {
@@ -215,48 +261,48 @@ namespace ServerBot
             { greet = string.Format("[Bot] {0}: Hallo there, {1}", BotMain.bcfg.OnjoinBot, pl.Name); }
             if (msg == 3)
             { greet = string.Format("[Bot] {0}: Well hello there, {1}, I'm {0}, and this is {2}!", BotMain.bcfg.OnjoinBot, pl.Name, BotMain.servername); }
-            if (msg== 4)
+            if (msg == 4)
             { greet = string.Format("[Bot] {0}: Hi there {1}! I hope you enjoy your stay", BotMain.bcfg.OnjoinBot, pl.Name); }
             pl.SendMessage(greet, BotMain.CommandBot.r, BotMain.CommandBot.g, BotMain.CommandBot.b);
         }
         #endregion
-        
+
         #region LogToConsole
         public static void LogToConsole(ConsoleColor clr, string message)
         {
-        	Console.ForegroundColor = clr;
-        	Console.WriteLine(message);
-        	Console.ResetColor();
-        	Log.Info(message);
+            Console.ForegroundColor = clr;
+            Console.WriteLine(message);
+            Console.ResetColor();
+            Log.Info(message);
         }
         public static void LogToConsole(ConsoleColor clr, string message, object[] objs)
         {
-        	Console.ForegroundColor = clr;
-        	Console.WriteLine(message, objs);
-        	Console.ResetColor();
-        	Log.Info(string.Format(message, objs));
+            Console.ForegroundColor = clr;
+            Console.WriteLine(message, objs);
+            Console.ResetColor();
+            Log.Info(string.Format(message, objs));
         }
         #endregion
-        
+
         #region RegisterBuiltinCommands
         public static void RegisterBuiltinCommands()
         {
-        	BotMain.Handler.RegisterCommand("help", BuiltinBotCommands.BotHelp);
-        	BotMain.Handler.RegisterCommand("kill", BuiltinBotCommands.BotKill);
-        	BotMain.Handler.RegisterCommand("hi", BuiltinBotCommands.BotGreet);
-        	BotMain.Handler.RegisterCommand("good", BuiltinBotCommands.BotResponseGood);
-        	BotMain.Handler.RegisterCommand("bad", BuiltinBotCommands.BotResponseBad);
-        	BotMain.Handler.RegisterCommand("hug", BuiltinBotCommands.BotHug);
-        	BotMain.Handler.RegisterCommand("ban", BuiltinBotCommands.BotBan);
-        	BotMain.Handler.RegisterCommand("kick", BuiltinBotCommands.BotKick);
-        	BotMain.Handler.RegisterCommand("mute", BuiltinBotCommands.BotMute);
-        	BotMain.Handler.RegisterCommand("unmute", BuiltinBotCommands.BotUnmute);
-        	BotMain.Handler.RegisterCommand("butcher", BuiltinBotCommands.BotButcher);
-        	//BotMain.Handler.RegisterCommand(new List<string>(){"How are you?", "how are you?", "how are you"}, BuiltinBotCommands.BotHowAreYou);
-        	BotMain.Handler.RegisterCommand("insult", BuiltinBotCommands.BotInsult);
-        	//BotMain.Handler.RegisterCommand(new List<string>(){"g", "google"}, BuiltinBotCommands.BotWebsite);
-        	BotMain.Handler.RegisterCommand("starttrivia", BuiltinBotCommands.BotTriviaStart);
-        	BotMain.Handler.RegisterCommand("answer", BuiltinBotCommands.BotTriviaAnswer);
+            BotMain.Handler.RegisterCommand("help", BuiltinBotCommands.BotHelp);
+            BotMain.Handler.RegisterCommand("kill", BuiltinBotCommands.BotKill);
+            BotMain.Handler.RegisterCommand("hi", BuiltinBotCommands.BotGreet);
+            BotMain.Handler.RegisterCommand("good", BuiltinBotCommands.BotResponseGood);
+            BotMain.Handler.RegisterCommand("bad", BuiltinBotCommands.BotResponseBad);
+            BotMain.Handler.RegisterCommand("hug", BuiltinBotCommands.BotHug);
+            BotMain.Handler.RegisterCommand("ban", BuiltinBotCommands.BotBan);
+            BotMain.Handler.RegisterCommand("kick", BuiltinBotCommands.BotKick);
+            BotMain.Handler.RegisterCommand("mute", BuiltinBotCommands.BotMute);
+            BotMain.Handler.RegisterCommand("unmute", BuiltinBotCommands.BotUnmute);
+            BotMain.Handler.RegisterCommand("butcher", BuiltinBotCommands.BotButcher);
+            //BotMain.Handler.RegisterCommand(new List<string>(){"How are you?", "how are you?", "how are you"}, BuiltinBotCommands.BotHowAreYou);
+            BotMain.Handler.RegisterCommand("insult", BuiltinBotCommands.BotInsult);
+            //BotMain.Handler.RegisterCommand(new List<string>(){"g", "google"}, BuiltinBotCommands.BotWebsite);
+            BotMain.Handler.RegisterCommand("starttrivia", BuiltinBotCommands.BotTriviaStart);
+            BotMain.Handler.RegisterCommand("answer", BuiltinBotCommands.BotTriviaAnswer);
             BotMain.Handler.RegisterCommand("badwords", BuiltinBotCommands.BotBadWords);
             BotMain.Handler.RegisterCommand("reload", BuiltinBotCommands.BotReloadCfg);
         }

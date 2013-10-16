@@ -10,7 +10,6 @@ using System.IO;
 using System;
 using MySql.Data.MySqlClient;
 using Mono.Data.Sqlite;
-using MySql.Web;
 using TShockAPI.DB;
 using TShockAPI;
 using Terraria;
