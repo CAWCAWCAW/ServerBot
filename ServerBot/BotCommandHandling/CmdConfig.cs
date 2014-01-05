@@ -9,11 +9,33 @@ namespace ServerBot
 {
     public class cBotCommand
     {
-        public string CommandName;     //Name of the chat-command to send to the bot
-        public string ReturnMessage;   //The message the bot will send to the player, or to the server
-        public List<string> CommandActions;    //Which commands from TShock.ChatCommands should be used when the bot command is used
+        /// <summary>
+        /// Name of the chat-command to send to the bot
+        /// </summary>
+        public string CommandName;
+
+        /// <summary>
+        /// The message the bot will send to the player, or to the server
+        /// </summary>
+        public string ReturnMessage;
+
+        /// <summary>
+        /// Which commands from TShock.ChatCommands should be used when the bot command is used
+        /// </summary>
+        public List<string> CommandActions;
+
+        /// <summary>
+        /// Whether the bot should broadcast to all players, or just the player who executed the command
+        /// </summary>
         public bool noisyCommand;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cn">CommandName</param>
+        /// <param name="rm">ReturnMessage</param>
+        /// <param name="ca">CommandActions</param>
+        /// <param name="noisy">NoisyCommand</param>
         public cBotCommand(string cn, string rm, List<string> ca, bool noisy)
         {
             CommandName = cn;

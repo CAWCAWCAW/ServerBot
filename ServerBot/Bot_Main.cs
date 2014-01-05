@@ -85,7 +85,7 @@ namespace ServerBot
             bTools.Handler = new BotCommandHandler();
             bTools.RegisterBuiltinCommands();
 
-            bTools.servername = TShock.Config.ServerName;
+            //bTools.servername = TShock.Config.ServerName;
 
             bTools.GetSwears();
         }
@@ -188,7 +188,7 @@ namespace ServerBot
         }
         #endregion
 
-        #region Bot.OnChat
+        #region OnChat
         public void OnChat(ServerChatEventArgs args)
         {
             TSPlayer player = TShock.Players[args.Who];

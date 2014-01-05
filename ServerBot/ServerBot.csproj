@@ -84,6 +84,7 @@
     <Compile Include="BotCommand.cs" />
     <Compile Include="BotCommandHandling\BotCommandHandler.cs" />
     <Compile Include="BotCommandHandling\BuiltinBotCommands.cs" />
+    <Compile Include="Bot_Timers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Bot.cs" />
     <Compile Include="Bot_Commands.cs" />

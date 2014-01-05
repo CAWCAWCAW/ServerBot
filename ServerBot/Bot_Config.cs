@@ -9,18 +9,19 @@ namespace ServerBot
     {
         public bool enableAutoJoin = true;
         public string bot_Name = "Botname";
-        public byte[] bot_MessageRGB = new byte[3] { 255, 255, 255 };
+        public int[] bot_MessageRGB = new int[3] { 255, 255, 255 };
         public string command_Char = "^";
         public string bot_Join_Message = "";
         public int kicks_Before_Ban = 3;
         public bool Snark = true;
         public int command_Success_Percent = 10;
-        public string generic_Insult_Names = "Tony Abbott";
+        public string generic_Insult_Names = "Tony Abbott,Justin B";
         public bool swear_Block = true;
-        public string[] swear_Block_Action = new string[3];
+        public string swear_Block_Action = string.Empty;
         public int swear_Block_Chances = 5;
+        
         public bool yolo_Swag_Block = true;
-        public string[] yolo_Swag_Action = new string[3];
+        public string yolo_Swag_Action = string.Empty;
         public string yolo_Swag_KickBan_Reason = "Failnoob";
 
 

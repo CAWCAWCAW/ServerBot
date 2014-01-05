@@ -136,10 +136,10 @@ namespace ServerBot
                     new TriviaConfig().Write(bTools.trivia_Save_Path);
                 }
             }
-            catch (Exception z)
+            catch (Exception x)
             {
                 Log.Error("Error in BotConfig.json");
-                Log.Info(z.ToString());
+                Log.Info(x.ToString());
             }
         }
         #endregion
@@ -161,6 +161,7 @@ namespace ServerBot
         public static void CheckChat(ServerChatEventArgs args)
         {
             var player = TShock.Players[args.Who];
+            var bPlayer = players[args.Who];
 
             if (args.Handled)
                 return;
@@ -168,6 +169,7 @@ namespace ServerBot
             if (BotCommandHandler.CheckForBotCommand(args.Text))
             {
                 bTools.Handler.HandleCommand(args.Text, player);
+                args.Handled = true;
             }
 
             #region ConfigCommands
@@ -177,22 +179,16 @@ namespace ServerBot
                 if (command != null)
                 {
                     if (command.ReturnMessage.Length > 0)
-                    {
                         if (!command.noisyCommand)
                             player.SendMessage(command.ReturnMessage, bTools.Bot.color);
                         else
                             TSPlayer.All.SendMessage(command.ReturnMessage, bTools.Bot.color);
-                    }
 
                     if (command.CommandActions.Count > 0)
-                    {
                         for (int i = 0; i < command.CommandActions.Count; i++)
-                        {
                             Commands.HandleCommand(player, command.CommandActions[i]);
-                        }
-                    }
+                    args.Handled = true;
                 }
-                args.Handled = true;
             }
             catch { }
             #endregion
@@ -202,7 +198,17 @@ namespace ServerBot
             {
                 if (!BotCommandHandler.CheckForBotCommand(args.Text) && !args.Text.StartsWith("/"))
                 {
-
+                    var command = getcBotCommand(args.Text);
+                    if (command == null)
+                    {
+                        foreach (string word in args.Text.Split(' '))
+                        {
+                            if (Swearwords.Contains(word))
+                            {
+                                checkOffences(bPlayer);
+                            }
+                        }
+                    }
                 }
 
             }
@@ -257,6 +263,41 @@ namespace ServerBot
         }
         #endregion
 
+        #region checkOffences
+        public static void checkOffences(bPlayer player)
+        {
+            player.swear_Count++;
+            var tsPlayer = TShock.Players[player.Index];
+            
+            if (player.swear_Count == bot_Config.swear_Block_Chances)
+            {
+                switch (bot_Config.swear_Block_Action)
+                {
+                    case "kick":
+                        {
+                            TShock.Utils.ForceKick(tsPlayer, string.Format("Swear count exceeds {0}",
+                                bot_Config.swear_Block_Chances), false, true);
+                            break;
+                        }
+                    case "mute":
+                        {
+                            tsPlayer.mute = true;
+                            tsPlayer.SendWarningMessage("You have been muted for: Swear count exceeds {0}",
+                                bot_Config.swear_Block_Chances);
+                            
+                            break;
+                        }
+                    case "ban":
+                        {
+                            TShock.Utils.Ban(tsPlayer, string.Format("Swear count exceeds {0}",
+                                bot_Config.swear_Block_Chances), true, Bot.Name);
+                            break;
+                        }
+                }
+            }
+        }
+        #endregion
+
         #region GreetMsg
         public static void GreetMsg(TSPlayer player, string msg)
         {
@@ -308,19 +349,15 @@ namespace ServerBot
         #region GetSwears
         public static void GetSwears()
         {
-            string swears = "";
             using (var reader = bTools.db.QueryReader("SELECT * FROM BotSwear"))
             {
                 while (reader.Read())
                 {
                     try
                     {
-                        swears = reader.Get<string>("SwearBlock");
-
-                        string[] words = swears.Split(',');
-                        foreach (string s in words)
+                        foreach (string swear in reader.Get<string>("SwearBlock").Split(','))
                         {
-                            bTools.Swearwords.Add(s.ToLower());
+                            bTools.Swearwords.Add(swear.ToLower());
                         }
                     }
                     catch { }

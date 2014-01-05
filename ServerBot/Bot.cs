@@ -13,7 +13,7 @@ namespace ServerBot
         public string Message = "";
         public int Msgtime = 0;
         public string Name;
-        public byte[] rgb = new byte[3];
+        public int[] rgb = new int[3];
         public Color color { get { return new Color(rgb[0], rgb[1], rgb[2]); } }
         public Trivia Trivia;
 
