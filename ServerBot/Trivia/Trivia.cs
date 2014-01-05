@@ -13,16 +13,16 @@ namespace ServerBot
 		private TriviaConfig Config;
 		private int NumQuestions;
 		private int NumQuestionsAsked;
-		private Bot Master;
+		private bBot Master;
 		public bool Enabled = false;
 		public bool OngoingGame = false;
 		public TriviaItem CurrentQuestion;
 		public List<TriviaItem> UnaskedQuestions = new List<TriviaItem>();
 		
-		public Trivia(Bot master) 
+		public Trivia(bBot master) 
 		{ 
 			Master = master;
-			LoadConfig(BotMain.TriviaSave);
+			LoadConfig(bTools.trivia_Save_Path);
 			if (Enabled)
 				UnaskedQuestions.AddRange(Config.TriviaItems);
 		}
@@ -41,7 +41,7 @@ namespace ServerBot
 			}
 			catch
 			{
-				TShockAPI.Log.ConsoleError(string.Format("Trivia config for the bot named {0} has failed to load. Trivia will be disabled until a proper config is given.", Master.Name));
+				TShockAPI.Log.ConsoleError("Trivia config for the bot named {0} has failed to load. Trivia will be disabled until a proper config is given.", Master.Name);
 			}
 		}
 		
@@ -61,7 +61,7 @@ namespace ServerBot
 			int choice = new Random().Next(UnaskedQuestions.Count);
 			CurrentQuestion = UnaskedQuestions[choice];
 			
-			Master.Say("Question Number {0}:", new object[]{NumQuestionsAsked.ToString()});
+			Master.Say("Question Number {0}:", NumQuestionsAsked.ToString());
 			Master.Say(CurrentQuestion.Question);
 			
 			UnaskedQuestions.Remove(CurrentQuestion);
@@ -71,7 +71,7 @@ namespace ServerBot
 		{
 			if (CurrentQuestion.Answer.ToLower() == ans.ToLower())
 			{
-				Master.Say("Congrats, {0}. You got the correct answer!", new object[]{player});
+				Master.Say("Congrats, {0}. You got the correct answer!", player);
 				//TODO: Insert Prize code here.
 
 

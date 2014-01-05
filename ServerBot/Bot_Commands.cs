@@ -8,25 +8,26 @@ using System.Data;
 using System.Net;
 using System.IO;
 using System;
+
 using MySql.Data.MySqlClient;
 using Mono.Data.Sqlite;
+
 using TShockAPI.DB;
 using TShockAPI;
+
 using Terraria;
 using TerrariaApi;
 using TerrariaApi.Server;
 
 namespace ServerBot
 {
-    public class BComs
+    public class bCommands
     {
         #region BotMethod
         public static void BotMethod(CommandArgs z)
-        {
-            string name = "";
-            int id = 0;
-
+        {            
             #region Invalid Syntax
+            /*
             if (z.Parameters.Count < 1)
             {
                 z.Player.SendWarningMessage("Invalid syntax.");
@@ -41,12 +42,7 @@ namespace ServerBot
             {
                 string plyname = z.Player.Name;
                 name = z.Parameters[1];
-                if (BotMain.bots.Count != 0)
-                {
-                    z.Player.SendWarningMessage("You may only have one bot at a time");
-                    return;
-                }
-                BotMain.bots.Add(new Bot(id, name));
+                
                 TSPlayer.All.SendInfoMessage(string.Format("Bot '{0}' was summoned by {1}", name, plyname));
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine(string.Format("Bot '{0}' was summoned by {1}", name, plyname));
@@ -59,11 +55,11 @@ namespace ServerBot
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine(string.Format("{0} made bot '{1}' leave.", z.Player.Name, name));
                 Console.ResetColor();
-                foreach (Bot b in BotMain.bots)
+                foreach (bBot b in ServerBots.bots)
                 {
                     if (b.Name == z.Parameters[1])
                     {
-                        BotMain.bots.RemoveAll(b1 => b1.Name == z.Parameters[1]);
+                        ServerBots.bots.RemoveAll(b1 => b1.Name == z.Parameters[1]);
                     }
                 }
             }
@@ -74,7 +70,7 @@ namespace ServerBot
             #region Bot.Colour + Bot.Talk
             else if (z.Parameters[0] == "colour" || z.Parameters[0] == "color")
             {
-                foreach (Bot b in BotMain.bots)
+                foreach (bBot b in ServerBots.bots)
                 {
                     if (b.Name == z.Parameters[1].ToString())
                     {
@@ -92,7 +88,7 @@ namespace ServerBot
             else if (z.Parameters[0] == "say")
             {
                 string text = z.Parameters[2];
-                foreach (Bot b in BotMain.bots)
+                foreach (bBot b in ServerBots.bots)
                 {
                     if (b.Name == z.Parameters[1].ToString())
                     {
@@ -116,7 +112,7 @@ namespace ServerBot
             #region Bot.Kill
             else if (z.Parameters[0] == "kill")
             {
-                foreach (Bot b in BotMain.bots)
+                foreach (bBot b in ServerBots.bots)
                 {
                     if (b.Name == z.Parameters[1])
                     {
@@ -127,7 +123,7 @@ namespace ServerBot
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine(string.Format("{0} killed bot {1}", z.Player.Name, b.Name));
                         Console.ResetColor();
-                        BotMain.bots.RemoveAll(b1 => b1.Name.ToLower() == z.Parameters[1].ToLower());
+                        ServerBots.bots.RemoveAll(b1 => b1.Name.ToLower() == z.Parameters[1].ToLower());
                     }
                     else
                     {
@@ -138,7 +134,7 @@ namespace ServerBot
 
             else if (z.Parameters[0] == "killall")
             {
-                BotMain.bots.Clear();
+                ServerBots.bots.Clear();
                 TSPlayer.All.SendWarningMessage("Bot genocide.");
                 TSPlayer.All.SendWarningMessage("They all died.");
                 Console.ForegroundColor = ConsoleColor.Magenta;
@@ -150,7 +146,7 @@ namespace ServerBot
             #region Bot.AutoSay
             else if (z.Parameters[0] == "asay")
             {
-                foreach (Bot b in BotMain.bots)
+                foreach (bBot b in ServerBots.bots)
                 {
                     if (b.Name == z.Parameters[1])
                     {
@@ -168,7 +164,7 @@ namespace ServerBot
             }
             else if (z.Parameters[0] == "mclear")
             {
-                foreach (Bot b in BotMain.bots)
+                foreach (bBot b in ServerBots.bots)
                 {
                     if (b.Name == z.Parameters[1])
                     {
@@ -182,46 +178,47 @@ namespace ServerBot
                     }
                 }
             }
+            */
             #endregion
         }
         #endregion
 
         #region Bot.Badwords
-        public static void BadWords(CommandArgs z)
+        public static void BadWords(CommandArgs args)
         {
-            if (z.Parameters.Count < 2)
+            if (args.Parameters.Count < 2)
             {
-                z.Player.SendWarningMessage("Invalid syntax. Try //badwords [add/del] word");
+                args.Player.SendWarningMessage("Invalid syntax. Try //badwords [add/del] word");
             }
-            else if (z.Parameters[0] == "add")
+            else if (args.Parameters[0] == "add")
             {
-                using (var reader = BotMain.db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]))
+                using (var reader = bTools.db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", args.Parameters[1]))
                 {
                     if (!reader.Read())
                     {
-                        BotMain.db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", z.Parameters[1]);
-                        z.Player.SendMessage(string.Format("Added {0} into the banned word list.", z.Parameters[1]), Color.CadetBlue);
-                        BotMain.Swearwords.Add(z.Parameters[1].ToLower());
+                        bTools.db.Query("INSERT INTO BotSwear (SwearBlock) VALUES (@0)", args.Parameters[1]);
+                        args.Player.SendMessage(string.Format("Added {0} into the banned word list.", args.Parameters[1]), Color.CadetBlue);
+                        bTools.Swearwords.Add(args.Parameters[1].ToLower());
                     }
                     else
                     {
-                        z.Player.SendWarningMessage(string.Format("{0} already exists in the swear list.", z.Parameters[1]));
+                        args.Player.SendWarningMessage(string.Format("{0} already exists in the swear list.", args.Parameters[1]));
                     }
                 }
             }
-            else if (z.Parameters[0] == "del")
+            else if (args.Parameters[0] == "del")
             {
-                using (var reader = BotMain.db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]))
+                using (var reader = bTools.db.QueryReader("SELECT * FROM BotSwear WHERE SwearBlock = @0", args.Parameters[1]))
                 {
                     if (reader.Read())
                     {
-                        BotMain.db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", z.Parameters[1]);
-                        z.Player.SendMessage(string.Format("Deleted {0} from the banned word list.", z.Parameters[1]), Color.CadetBlue);
-                        BotMain.Swearwords.Remove(z.Parameters[1].ToLower());
+                        bTools.db.Query("DELETE FROM BotSwear WHERE SwearBlock = @0", args.Parameters[1]);
+                        args.Player.SendMessage(string.Format("Deleted {0} from the banned word list.", args.Parameters[1]), Color.CadetBlue);
+                        bTools.Swearwords.Remove(args.Parameters[1].ToLower());
                     }
                     else
                     {
-                        z.Player.SendWarningMessage(string.Format("{0} does not exist in the swear list.", z.Parameters[1]));
+                        args.Player.SendWarningMessage(string.Format("{0} does not exist in the swear list.", args.Parameters[1]));
                     }
                 }
             }
@@ -229,14 +226,12 @@ namespace ServerBot
         #endregion
 
         #region Bot.ReloadCfg
-        public static void ReloadCfg(CommandArgs z)
+        public static void ReloadCfg(CommandArgs args)
         {
-            Utils.SetUpConfig();
-            foreach (Bot b in BotMain.bots)
-            {
-            	b.Trivia.LoadConfig(BotMain.TriviaSave);
-            }
-            z.Player.SendWarningMessage("Reloaded Bot config");
+            bTools.SetUpConfig();
+            bTools.Bot.Trivia.LoadConfig(bTools.trivia_Save_Path);
+
+            args.Player.SendWarningMessage("Reloaded Bot config");
         }
         #endregion
 
@@ -252,11 +247,11 @@ namespace ServerBot
                 if (z.Parameters[0] == "add")
                 {
                     var ply = TShock.Users.GetUserByName(z.Parameters[1]);
-                    using (var reader = BotMain.db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]))
+                    using (var reader = bTools.db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]))
                     {
                         if (!reader.Read())
                         {
-                            BotMain.db.Query("INSERT INTO BotKick (KickNames) VALUES (@0)", z.Parameters[1]);
+                            bTools.db.Query("INSERT INTO BotKick (KickNames) VALUES (@0)", z.Parameters[1]);
                             z.Player.SendMessage(string.Format("Added {0} to the joinkick player list.", z.Parameters[1]), Color.CadetBlue);
                         }
                         else
@@ -267,11 +262,11 @@ namespace ServerBot
                 }
                 else if (z.Parameters[0] == "del")
                 {
-                    using (var reader = BotMain.db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]))
+                    using (var reader = bTools.db.QueryReader("SELECT * FROM BotKick WHERE KickNames = @0", z.Parameters[1]))
                     {
                         if (reader.Read())
                         {
-                            BotMain.db.Query("DELETE FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
+                            bTools.db.Query("DELETE FROM BotKick WHERE KickNames = @0", z.Parameters[1]);
                             z.Player.SendMessage(string.Format("Deleted {0} from the joinkick player list!", z.Parameters[1]), Color.CadetBlue);
                         }
                         else

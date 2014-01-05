@@ -25,7 +25,7 @@ namespace ServerBot
 			string name = parms[1];
 			
 			parms.RemoveRange(0,2);
-			BotCommandArgs args = new BotCommandArgs(name, parms, BotMain.CommandBot, ply);
+			BotCommandArgs args = new BotCommandArgs(name, parms, bTools.Bot, ply);
 			foreach (BotCommand com in Commands)
 			{
 				if (com.Names.Contains(name))
@@ -47,7 +47,7 @@ namespace ServerBot
 		
 		public static bool CheckForBotCommand(string msg)
 		{
-			if (msg.StartsWith(BotMain.bcfg.CommandChar))
+			if (msg.StartsWith(bTools.bot_Config.command_Char))
 				return true;
 			return false;
 		}

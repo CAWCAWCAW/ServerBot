@@ -25,9 +25,9 @@ namespace ServerBot
 		public string Command;
 		public List<string> Parameters;
 		public TSPlayer Player;
-		public Bot Bot;
+		public bBot Bot;
 		
-		public BotCommandArgs(string command, List<string> parms, Bot bot, TSPlayer ply)
+		public BotCommandArgs(string command, List<string> parms, bBot bot, TSPlayer ply)
 		{
 			Command = command;
 			Parameters = parms;

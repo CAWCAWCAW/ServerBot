@@ -7,16 +7,16 @@ using TShockAPI;
 
 namespace ServerBot
 {
-    public class Pl
+    public class bPlayer
     {
         public int Index;
-        public int scount = 0;
-        public int kcount = 0;
-        public string ctype = "";
+        public int swear_Count = 0;
+        public int kick_Count = 0;
+        public string ctype = ""; //?
         public TSPlayer TSPlayer { get { return TShock.Players[Index]; } }
         public string PlayerName { get { return Main.player[Index].name; } }
 
-        public Pl(int index)
+        public bPlayer(int index)
         {
             Index = index;
         }

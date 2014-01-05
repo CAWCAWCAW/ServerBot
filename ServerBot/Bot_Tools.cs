@@ -18,22 +18,50 @@ using TerrariaApi.Server;
 
 namespace ServerBot
 {
-    public class Utils
+    public class bTools
     {
+        public static bConfig bot_Config { get; set; }
+        public static CmdConfig com_Config { get; set; }
+        public WebRequest request;
+        internal static string save_Path { get { return Path.Combine(TShock.SavePath, "ServerBot/BotConfig.json"); } }
+        internal static string trivia_Save_Path { get { return Path.Combine(TShock.SavePath, "ServerBot/TriviaConfig.json"); } }
+        internal static string com_Save_Path { get { return Path.Combine(TShock.SavePath, "ServerBot/BotCommands.json"); } }
+        public static bBot Bot { get; set; }
+        public static List<bPlayer> players = new List<bPlayer>();
+        public static DateTime lastmsgupdate = DateTime.Now;
+        public static DateTime lastswearupdate = DateTime.Now;
+        public static Random rid = new Random();
+        public static string IP { get; set; }
+        public static int plycount = 0;
+        public static string servername { get; set; }
+        public static BotCommandHandler Handler;
+        public static bBot CommandBot;
+        public static List<string> Swearwords = new List<string>();
+        public static IDbConnection db;
+
+        public static void autoJoin(EventArgs args)
+        {
+            if (bot_Config.enableAutoJoin)
+            {
+                Bot = new bBot(bot_Config.bot_Name);
+                Bot.doSetUp();
+            }
+        }
+
         #region Database
         public static void SetUpDB()
         {
             if (TShock.Config.StorageType.ToLower() == "sqlite")
             {
-                BotMain.db = new SqliteConnection(string.Format("uri=file://{0},Version=3", Path.Combine(TShock.SavePath, "ServerBot/ServerBot.sqlite")));
+                bTools.db = new SqliteConnection(string.Format("uri=file://{0},Version=3", Path.Combine(TShock.SavePath, "ServerBot/ServerBot.sqlite")));
             }
             else if (TShock.Config.StorageType.ToLower() == "mysql")
             {
                 try
                 {
                     var host = TShock.Config.MySqlHost.Split(':');
-                    BotMain.db = new MySqlConnection();
-                    BotMain.db.ConnectionString =
+                    bTools.db = new MySqlConnection();
+                    bTools.db.ConnectionString =
                         String.Format("Server={0}; Port={1}; Database={2}; Uid={3}; Pwd={4};",
                                       host[0],
                                       host.Length == 1 ? "3306" : host[1],
@@ -58,8 +86,8 @@ namespace ServerBot
                                      new SqlColumn("KickNames", MySqlDbType.Text),
                                      new SqlColumn("KickIP", MySqlDbType.Text)
                 );
-            var SQLcreator = new SqlTableCreator(BotMain.db,
-                                                 BotMain.db.GetSqlType() == SqlType.Sqlite
+            var SQLcreator = new SqlTableCreator(bTools.db,
+                                                 bTools.db.GetSqlType() == SqlType.Sqlite
                                                  ? (IQueryBuilder)new SqliteQueryCreator()
                                                  : new MysqlQueryCreator());
 
@@ -75,37 +103,37 @@ namespace ServerBot
         #region SetUpConfig
         public static void SetUpConfig()
         {
-            BotMain.bcfg = new BotConfig();
-            BotMain.ccfg = new CmdConfig();
+            bTools.bot_Config = new bConfig();
+            bTools.com_Config = new CmdConfig();
 
             try
             {
                 if (Directory.Exists(Path.Combine(TShock.SavePath, "ServerBot")))
                 {
-                    if (File.Exists(BotMain.BotSave))
+                    if (File.Exists(bTools.save_Path))
                     {
-                        BotMain.bcfg = BotConfig.Read(BotMain.BotSave);
+                        bTools.bot_Config = bConfig.Read(bTools.save_Path);
                     }
                     else
                     {
-                        BotMain.bcfg.Write(BotMain.BotSave);
+                        bTools.bot_Config.Write(bTools.save_Path);
                     }
-                    if (!File.Exists(BotMain.TriviaSave))
+                    if (!File.Exists(bTools.trivia_Save_Path))
                     {
-                        new TriviaConfig().Write(BotMain.TriviaSave);
+                        new TriviaConfig().Write(bTools.trivia_Save_Path);
                     }
 
-                    if (File.Exists(BotMain.BotCmdSave))
-                        BotMain.ccfg = CmdConfig.Read(BotMain.BotCmdSave);
+                    if (File.Exists(bTools.com_Save_Path))
+                        bTools.com_Config = CmdConfig.Read(bTools.com_Save_Path);
                     else
-                        BotMain.ccfg.Write(BotMain.BotCmdSave);
+                        bTools.com_Config.Write(bTools.com_Save_Path);
                 }
                 else
                 {
                     Directory.CreateDirectory(Path.Combine(TShock.SavePath, "ServerBot"));
-                    BotMain.bcfg.Write(BotMain.BotSave);
-                    BotMain.ccfg.Write(BotMain.BotCmdSave);
-                    new TriviaConfig().Write(BotMain.TriviaSave);
+                    bTools.bot_Config.Write(bTools.save_Path);
+                    bTools.com_Config.Write(bTools.com_Save_Path);
+                    new TriviaConfig().Write(bTools.trivia_Save_Path);
                 }
             }
             catch (Exception z)
@@ -118,9 +146,9 @@ namespace ServerBot
 
         public static cBotCommand getcBotCommand(string text)
         {
-            for (int i = 0; i < BotMain.ccfg.BotActions.Count; i++)
+            for (int i = 0; i < bTools.com_Config.BotActions.Count; i++)
             {
-                foreach (cBotCommand c in BotMain.ccfg.BotActions[i].botcommands)
+                foreach (cBotCommand c in bTools.com_Config.BotActions[i].botcommands)
                 {
                     if (c.CommandName == text)
                         return c;
@@ -130,95 +158,74 @@ namespace ServerBot
         }
 
         #region CheckChat
-        public static void CheckChat(string text, TSPlayer pl)
+        public static void CheckChat(ServerChatEventArgs args)
         {
+            var player = TShock.Players[args.Who];
+
+            if (args.Handled)
+                return;
+
+            if (BotCommandHandler.CheckForBotCommand(args.Text))
+            {
+                bTools.Handler.HandleCommand(args.Text, player);
+            }
+
             #region ConfigCommands
             try
             {
-                var command = getcBotCommand(text);
+                var command = getcBotCommand(args.Text);
                 if (command != null)
                 {
                     if (command.ReturnMessage.Length > 0)
                     {
                         if (!command.noisyCommand)
-                            pl.SendMessage(command.ReturnMessage, BotMain.CommandBot.color);
+                            player.SendMessage(command.ReturnMessage, bTools.Bot.color);
                         else
-                            TSPlayer.All.SendMessage(command.ReturnMessage, BotMain.CommandBot.color);
+                            TSPlayer.All.SendMessage(command.ReturnMessage, bTools.Bot.color);
                     }
 
                     if (command.CommandActions.Count > 0)
                     {
                         for (int i = 0; i < command.CommandActions.Count; i++)
                         {
-                            Commands.HandleCommand(pl, command.CommandActions[i]);
+                            Commands.HandleCommand(player, command.CommandActions[i]);
                         }
                     }
                 }
+                args.Handled = true;
             }
             catch { }
             #endregion
 
             #region Swearblocker
-            if (BotMain.bcfg.EnableSwearBlocker)
+            if (bTools.bot_Config.swear_Block)
             {
-                foreach (Pl p in BotMain.players)
+                if (!BotCommandHandler.CheckForBotCommand(args.Text) && !args.Text.StartsWith("/"))
                 {
-                    if (p.PlayerName == pl.Name)
-                    {
-                        if (!text.StartsWith("^"))
-                        {
-                            var parts = text.Split();
-                            foreach (string s in parts)
-                            {
-                                if (BotMain.Swearwords.Contains(s.ToLower()))
-                                {
-                                    if (BotMain.bcfg.SwearBlockAction == "kick")
-                                    {
-                                        p.scount++;
-                                        p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}", p.scount));
-                                        if (p.scount >= BotMain.bcfg.SwearBlockChances)
-                                        {
-                                            TShock.Utils.ForceKick(pl, "Swearing", false, false);
-                                            p.scount = 0;
-                                        }
-                                    }
-                                    else if (BotMain.bcfg.SwearBlockAction == "mute")
-                                    {
-                                        p.scount++;
-                                        p.TSPlayer.SendWarningMessage(string.Format("Your swear warning count has risen! It is now: {0}/{1}", p.scount, BotMain.bcfg.SwearBlockChances));
-                                        if (p.scount >= BotMain.bcfg.SwearBlockChances)
-                                        {
-                                            pl.mute = true;
-                                            pl.SendWarningMessage("You have been muted for swearing!");
-                                            p.scount = 0;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+
                 }
+
             }
             #endregion
 
             #region YoloSwagDeath
-            if (BotMain.bcfg.EnableYoloSwagBlock)
+            /*  (bTools.bot_Config.EnableYoloSwagBlock)
             {
                 if (!text.StartsWith("/") || !text.StartsWith("^"))
                 {
                     if (text.ToLower().Contains("yolo") || text.ToLower().Contains("y.o.l.o"))
                     {
                         var plr = TShock.Utils.FindPlayer(pl.Name)[0];
-                        if (BotMain.bcfg.FailNoobAction == "kill")
+                        if (bTools.bot_Config.FailNoobAction == "kill")
                         {
                             plr.DamagePlayer(999999);
                             TSPlayer.All.SendMessage(string.Format("{0} lived more than once. Liar.", plr.Name), Color.CadetBlue);
                         }
-                        else if (BotMain.bcfg.FailNoobAction == "kick")
+                        else if (bTools.bot_Config.FailNoobAction == "kick")
                         {
-                            TShock.Utils.ForceKick(plr, BotMain.bcfg.FailNoobKickReason, false, false);
+                            TShock.Utils.ForceKick(plr, bTools.bot_Config.FailNoobKickReason, false, false);
                         }
-                        else if (BotMain.bcfg.FailNoobAction == "mute")
+                        else if (bTools.bot_Config.FailNoobAction == "mute")
                         {
                             plr.mute = true;
                             plr.SendWarningMessage("You've been muted for yoloing.");
@@ -228,16 +235,16 @@ namespace ServerBot
                     {
                         var player = TShock.Utils.FindPlayer(pl.Name);
                         var plr = player[0];
-                        if (BotMain.bcfg.FailNoobAction == "kill")
+                        if (bTools.bot_Config.FailNoobAction == "kill")
                         {
                             plr.DamagePlayer(999999);
                             TSPlayer.All.SendMessage(string.Format("Swag doesn't stop your players from DYING, {0}", plr.Name), Color.CadetBlue);
                         }
-                        else if (BotMain.bcfg.FailNoobAction == "kick")
+                        else if (bTools.bot_Config.FailNoobAction == "kick")
                         {
-                            TShock.Utils.ForceKick(plr, BotMain.bcfg.FailNoobKickReason, false, false);
+                            TShock.Utils.ForceKick(plr, bTools.bot_Config.FailNoobKickReason, false, false);
                         }
-                        else if (BotMain.bcfg.FailNoobAction == "mute")
+                        else if (bTools.bot_Config.FailNoobAction == "mute")
                         {
                             plr.mute = true;
                             plr.SendWarningMessage("You have been muted for swagging.");
@@ -245,25 +252,15 @@ namespace ServerBot
                     }
                 }
             }
+             */
             #endregion
         }
         #endregion
 
         #region GreetMsg
-        public static void GreetMsg(TSPlayer pl, int msg)
+        public static void GreetMsg(TSPlayer player, string msg)
         {
-            string greet = "";
-            if (msg == 0)
-            { greet = string.Format("[Bot] {0}: Hi {1}, welcome to {2}!", BotMain.bcfg.OnjoinBot, pl.Name, TShock.Config.ServerNickname); }
-            if (msg == 1)
-            { greet = string.Format("[Bot] {0}: Welcome to the land of amaaaaziiiiinnnng, {1}", BotMain.bcfg.OnjoinBot, pl.Name); }
-            if (msg == 2)
-            { greet = string.Format("[Bot] {0}: Hallo there, {1}", BotMain.bcfg.OnjoinBot, pl.Name); }
-            if (msg == 3)
-            { greet = string.Format("[Bot] {0}: Well hello there, {1}, I'm {0}, and this is {2}!", BotMain.bcfg.OnjoinBot, pl.Name, BotMain.servername); }
-            if (msg == 4)
-            { greet = string.Format("[Bot] {0}: Hi there {1}! I hope you enjoy your stay", BotMain.bcfg.OnjoinBot, pl.Name); }
-            pl.SendMessage(greet, BotMain.CommandBot.r, BotMain.CommandBot.g, BotMain.CommandBot.b);
+            player.SendMessage(msg, Bot.color);
         }
         #endregion
 
@@ -275,7 +272,7 @@ namespace ServerBot
             Console.ResetColor();
             Log.Info(message);
         }
-        public static void LogToConsole(ConsoleColor clr, string message, object[] objs)
+        public static void LogToConsole(ConsoleColor clr, string message, params object[] objs)
         {
             Console.ForegroundColor = clr;
             Console.WriteLine(message, objs);
@@ -287,24 +284,24 @@ namespace ServerBot
         #region RegisterBuiltinCommands
         public static void RegisterBuiltinCommands()
         {
-            BotMain.Handler.RegisterCommand("help", BuiltinBotCommands.BotHelp);
-            BotMain.Handler.RegisterCommand("kill", BuiltinBotCommands.BotKill);
-            BotMain.Handler.RegisterCommand("hi", BuiltinBotCommands.BotGreet);
-            BotMain.Handler.RegisterCommand("good", BuiltinBotCommands.BotResponseGood);
-            BotMain.Handler.RegisterCommand("bad", BuiltinBotCommands.BotResponseBad);
-            BotMain.Handler.RegisterCommand("hug", BuiltinBotCommands.BotHug);
-            BotMain.Handler.RegisterCommand("ban", BuiltinBotCommands.BotBan);
-            BotMain.Handler.RegisterCommand("kick", BuiltinBotCommands.BotKick);
-            BotMain.Handler.RegisterCommand("mute", BuiltinBotCommands.BotMute);
-            BotMain.Handler.RegisterCommand("unmute", BuiltinBotCommands.BotUnmute);
-            BotMain.Handler.RegisterCommand("butcher", BuiltinBotCommands.BotButcher);
+            bTools.Handler.RegisterCommand("help", BuiltinBotCommands.BotHelp);
+            bTools.Handler.RegisterCommand("kill", BuiltinBotCommands.BotKill);
+            bTools.Handler.RegisterCommand("hi", BuiltinBotCommands.BotGreet);
+            bTools.Handler.RegisterCommand("good", BuiltinBotCommands.BotResponseGood);
+            bTools.Handler.RegisterCommand("bad", BuiltinBotCommands.BotResponseBad);
+            bTools.Handler.RegisterCommand("hug", BuiltinBotCommands.BotHug);
+            bTools.Handler.RegisterCommand("ban", BuiltinBotCommands.BotBan);
+            bTools.Handler.RegisterCommand("kick", BuiltinBotCommands.BotKick);
+            bTools.Handler.RegisterCommand("mute", BuiltinBotCommands.BotMute);
+            bTools.Handler.RegisterCommand("unmute", BuiltinBotCommands.BotUnmute);
+            bTools.Handler.RegisterCommand("butcher", BuiltinBotCommands.BotButcher);
             //BotMain.Handler.RegisterCommand(new List<string>(){"How are you?", "how are you?", "how are you"}, BuiltinBotCommands.BotHowAreYou);
-            BotMain.Handler.RegisterCommand("insult", BuiltinBotCommands.BotInsult);
+            bTools.Handler.RegisterCommand("insult", BuiltinBotCommands.BotInsult);
             //BotMain.Handler.RegisterCommand(new List<string>(){"g", "google"}, BuiltinBotCommands.BotWebsite);
-            BotMain.Handler.RegisterCommand("starttrivia", BuiltinBotCommands.BotTriviaStart);
-            BotMain.Handler.RegisterCommand("answer", BuiltinBotCommands.BotTriviaAnswer);
-            BotMain.Handler.RegisterCommand("badwords", BuiltinBotCommands.BotBadWords);
-            BotMain.Handler.RegisterCommand("reload", BuiltinBotCommands.BotReloadCfg);
+            bTools.Handler.RegisterCommand("starttrivia", BuiltinBotCommands.BotTriviaStart);
+            bTools.Handler.RegisterCommand("answer", BuiltinBotCommands.BotTriviaAnswer);
+            bTools.Handler.RegisterCommand("badwords", BuiltinBotCommands.BotBadWords);
+            bTools.Handler.RegisterCommand("reload", BuiltinBotCommands.BotReloadCfg);
         }
         #endregion
 
@@ -312,7 +309,7 @@ namespace ServerBot
         public static void GetSwears()
         {
             string swears = "";
-            using (var reader = BotMain.db.QueryReader("SELECT * FROM BotSwear"))
+            using (var reader = bTools.db.QueryReader("SELECT * FROM BotSwear"))
             {
                 while (reader.Read())
                 {
@@ -323,7 +320,7 @@ namespace ServerBot
                         string[] words = swears.Split(',');
                         foreach (string s in words)
                         {
-                            BotMain.Swearwords.Add(s.ToLower());
+                            bTools.Swearwords.Add(s.ToLower());
                         }
                     }
                     catch { }
